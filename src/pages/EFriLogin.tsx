@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -11,6 +11,7 @@ const EFriLogin = () => {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const validate = () => {
     const errs: typeof errors = {};
@@ -27,7 +28,8 @@ const EFriLogin = () => {
     setLoading(true);
     await new Promise((r) => setTimeout(r, 1500));
     setLoading(false);
-    toast({ title: "Connexion simulée", description: "Bienvenue sur e-FRI !" });
+    toast({ title: "Connexion réussie", description: "Bienvenue sur e-FRI !" });
+    navigate("/e-fri/dashboard");
   };
 
   return (
