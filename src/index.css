@@ -65,39 +65,11 @@
 }
 
 /* Hero section animations */
-@keyframes hero-float-rect {
-  0%, 100% { transform: rotate(-8deg) translateY(0); }
-  50% { transform: rotate(-8deg) translateY(-12px); }
-}
 @keyframes hero-float-green {
-  0%, 100% { transform: translateX(-50%) translateY(0); }
-  50% { transform: translateX(-50%) translateY(-8px); }
-}
-@keyframes hero-float-pink {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
-}
-@keyframes hero-pulse-dots {
-  0%, 100% { opacity: 0.6; }
-  50% { opacity: 1; }
-}
-@keyframes hero-rotate-dashes {
-  0%, 100% { transform: rotate(0deg); }
-  50% { transform: rotate(5deg); }
+  50% { transform: translateY(-10px); }
 }
 
-.animate-hero-float-rect {
-  animation: hero-float-rect 4s ease-in-out infinite;
-}
 .animate-hero-float-green {
-  animation: hero-float-green 3s ease-in-out 0.8s infinite;
-}
-.animate-hero-float-pink {
-  animation: hero-float-pink 5s ease-in-out 0.4s infinite;
-}
-.animate-hero-pulse-dots {
-  animation: hero-pulse-dots 2.5s ease-in-out infinite;
-}
-.animate-hero-rotate-dashes {
-  animation: hero-rotate-dashes 3.5s ease-in-out infinite;
+  animation: hero-float-green 3s ease-in-out infinite;
 }

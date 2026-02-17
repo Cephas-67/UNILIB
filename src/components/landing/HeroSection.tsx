@@ -45,43 +45,41 @@ const HeroSection = () => {
 
           {/* Right column - Photo + Decorative shapes */}
           <div className="flex-1 relative h-[400px] lg:h-[480px] w-full">
-            {/* 1. Grand rectangle arrondi violet-bleu (arrière-plan) */}
+          {/* 1. Grand rectangle arrondi bleu (arrière-plan, fixe) */}
             <div
-              className="absolute rounded-[28px] animate-hero-float-rect"
+              className="absolute rounded-[32px]"
               style={{
-                backgroundColor: "#5C6BC0",
-                opacity: 0.9,
-                width: "280px",
-                height: "320px",
-                top: "-10px",
-                right: "-10px",
-                transform: "rotate(-8deg)",
+                backgroundColor: "hsl(var(--secondary))",
+                width: "320px",
+                height: "380px",
+                top: "-20px",
+                right: "-20px",
+                transform: "rotate(-12deg)",
               }}
             />
 
-            {/* 2. Cercle vert menthe */}
+            {/* 2. Cercle vert (animé) */}
             <div
               className="absolute rounded-full animate-hero-float-green"
               style={{
-                backgroundColor: "#A5D6A7",
-                width: "110px",
-                height: "110px",
-                top: "20px",
-                left: "50%",
-                transform: "translateX(-50%)",
+                backgroundColor: "hsl(var(--primary))",
+                width: "80px",
+                height: "80px",
+                top: "10px",
+                left: "42%",
               }}
             />
 
-            {/* 3. Grand cercle rose outline */}
+            {/* 3. Grand cercle orange (fixe, rempli) */}
             <div
-              className="absolute rounded-full animate-hero-float-pink"
+              className="absolute rounded-full"
               style={{
-                border: "1.5px solid #EF9A9A",
-                backgroundColor: "transparent",
-                width: "200px",
-                height: "200px",
-                bottom: "10px",
-                left: "40px",
+                backgroundColor: "hsl(var(--accent))",
+                opacity: 0.35,
+                width: "240px",
+                height: "240px",
+                bottom: "-30px",
+                left: "20px",
               }}
             />
 
@@ -103,23 +101,21 @@ const HeroSection = () => {
               />
             </div>
 
-            {/* 5. Grille de points roses - coin inférieur droit */}
-            <div className="absolute bottom-4 right-4 z-20 animate-hero-pulse-dots">
-              <DotGrid color="#F48FB1" />
+            {/* 5. Grille de points orange — coin inférieur droit */}
+            <div className="absolute bottom-4 right-4 z-20">
+              <DotGrid color="hsl(var(--accent))" />
             </div>
 
-            {/* 6. Grille de points bleus - coin supérieur gauche */}
-            <div className="absolute top-8 left-4 z-20 animate-hero-pulse-dots">
-              <DotGrid color="#90CAF9" />
-            </div>
-
-            {/* 7. Tirets verts décoratifs - coin supérieur droit */}
-            <div className="absolute top-8 right-8 z-20 animate-hero-rotate-dashes">
-              <svg width="40" height="40" viewBox="0 0 40 40">
-                <line x1="5" y1="5" x2="18" y2="5" stroke="#81C784" strokeWidth="2" />
-                <line x1="10" y1="14" x2="28" y2="14" stroke="#81C784" strokeWidth="2" />
-                <line x1="5" y1="23" x2="22" y2="23" stroke="#81C784" strokeWidth="2" />
-                <line x1="12" y1="32" x2="25" y2="32" stroke="#81C784" strokeWidth="2" />
+            {/* 6. Cercle outline vert pointillé — haut droite */}
+            <div
+              className="absolute z-5"
+              style={{
+                top: "30px",
+                right: "60px",
+              }}
+            >
+              <svg width="60" height="60" viewBox="0 0 60 60">
+                <circle cx="30" cy="30" r="28" fill="none" stroke="hsl(var(--primary))" strokeWidth="1.5" strokeDasharray="4 3" opacity="0.5" />
               </svg>
             </div>
           </div>
