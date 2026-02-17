@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Mail, Lock, Eye, EyeOff, User } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -27,6 +27,7 @@ const EFriSignup = () => {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const update = (key: string, value: string | boolean) => setForm((f) => ({ ...f, [key]: value }));
 
@@ -53,7 +54,8 @@ const EFriSignup = () => {
     setLoading(true);
     await new Promise((r) => setTimeout(r, 1500));
     setLoading(false);
-    toast({ title: "Inscription simulée", description: "Votre compte a été créé avec succès !" });
+    toast({ title: "Inscription réussie", description: "Votre compte a été créé avec succès !" });
+    navigate("/e-fri/dashboard");
   };
 
   const strength = getPasswordStrength(form.password);
