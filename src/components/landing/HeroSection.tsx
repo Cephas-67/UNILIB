@@ -2,10 +2,12 @@ import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import studentHero from "@/assets/student-hero.png";
 
-const DotGrid = ({ color, className }: { color: string; className?: string }) => (
+const TriangleGrid = ({ color, className }: { color: string; className?: string }) => (
   <div className={`grid grid-cols-4 gap-2 ${className}`}>
     {Array.from({ length: 16 }).map((_, i) => (
-      <div key={i} className="w-1 h-1 rounded-full" style={{ backgroundColor: color }} />
+      <svg key={i} width="6" height="6" viewBox="0 0 6 6">
+        <polygon points="3,0 6,6 0,6" fill={color} />
+      </svg>
     ))}
   </div>
 );
@@ -105,23 +107,14 @@ const HeroSection = () => {
               />
             </div>
 
-            {/* 5. Grille de points orange — coin inférieur droit */}
+            {/* 5. Grille de triangles orange — coin inférieur droit */}
             <div className="absolute bottom-8 right-4" style={{ zIndex: 4 }}>
-              <DotGrid color="hsl(var(--accent))" />
+              <TriangleGrid color="hsl(var(--accent))" />
             </div>
 
-            {/* 6. Cercle outline vert pointillé — haut droite */}
-            <div
-              className="absolute"
-              style={{
-                top: "30px",
-                right: "50px",
-                zIndex: 4,
-              }}
-            >
-              <svg width="60" height="60" viewBox="0 0 60 60">
-                <circle cx="30" cy="30" r="28" fill="none" stroke="hsl(var(--primary))" strokeWidth="1.5" strokeDasharray="4 3" opacity="0.5" />
-              </svg>
+            {/* 6. Grille de triangles verte — coin supérieur droit */}
+            <div className="absolute top-16 right-12" style={{ zIndex: 4 }}>
+              <TriangleGrid color="hsl(var(--primary))" />
             </div>
           </div>
         </div>
