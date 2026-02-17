@@ -50,7 +50,7 @@ const HeroSection = () => {
 
           {/* Right column - Photo + Decorative shapes */}
           <div className="flex-1 relative h-[460px] lg:h-[500px] w-full max-w-[480px]">
-            {/* 1. Grand rectangle arrondi bleu — derrière la tête */}
+            {/* 1. Grand rectangle arrondi bleu — centré derrière la photo */}
             <div
               className="absolute rounded-[32px]"
               style={{
@@ -58,26 +58,26 @@ const HeroSection = () => {
                 width: "300px",
                 height: "360px",
                 top: "0px",
-                right: "-10px",
-                transform: "rotate(-10deg)",
+                left: "50%",
+                transform: "translateX(-45%) rotate(-10deg)",
                 zIndex: 1,
               }}
             />
 
-            {/* 2. Cercle vert (animé) — haut centre */}
+            {/* 2. Cercle vert (animé) — en haut, ne cache pas le visage */}
             <div
               className="absolute rounded-full animate-hero-float-green"
               style={{
                 backgroundColor: "hsl(var(--primary))",
                 width: "70px",
                 height: "70px",
-                top: "15px",
-                left: "35%",
+                top: "5px",
+                left: "28%",
                 zIndex: 3,
               }}
             />
 
-            {/* 3. Grand cercle orange/rose rempli — bas gauche, couvre le bas de la photo */}
+            {/* 3. Grand cercle orange — bas centre, accompagne la photo */}
             <div
               className="absolute rounded-full"
               style={{
@@ -86,12 +86,13 @@ const HeroSection = () => {
                 width: "240px",
                 height: "240px",
                 bottom: "-40px",
-                left: "30px",
+                left: "50%",
+                transform: "translateX(-60%)",
                 zIndex: 3,
               }}
             />
 
-            {/* 4. Cercle outline rose — superposé au cercle rempli */}
+            {/* 4. Cercle outline — superposé */}
             <div
               className="absolute rounded-full"
               style={{
@@ -100,12 +101,13 @@ const HeroSection = () => {
                 width: "180px",
                 height: "180px",
                 bottom: "10px",
-                left: "10px",
+                left: "50%",
+                transform: "translateX(-80%)",
                 zIndex: 3,
               }}
             />
 
-            {/* 5. Photo étudiant — centrée, le bas est masqué par le cercle orange */}
+            {/* 5. Photo étudiant — centrée sur la carte bleue */}
             <div
               className="absolute"
               style={{
@@ -127,7 +129,7 @@ const HeroSection = () => {
               />
             </div>
 
-            {/* 6. Grille de points orange — coin inférieur droit */}
+            {/* 6. Points orange — bas droite */}
             <div className="absolute bottom-4 right-0" style={{ zIndex: 5 }}>
               <DotGrid color="hsl(var(--accent))" />
             </div>
