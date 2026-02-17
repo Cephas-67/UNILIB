@@ -44,17 +44,18 @@ const HeroSection = () => {
           </div>
 
           {/* Right column - Photo + Decorative shapes */}
-          <div className="flex-1 relative h-[400px] lg:h-[480px] w-full">
-          {/* 1. Grand rectangle arrondi bleu (arrière-plan, fixe) */}
+          <div className="flex-1 relative h-[500px] lg:h-[560px] w-full">
+            {/* 1. Grand rectangle arrondi bleu — DERRIÈRE la photo */}
             <div
               className="absolute rounded-[32px]"
               style={{
                 backgroundColor: "hsl(var(--secondary))",
-                width: "320px",
-                height: "380px",
-                top: "-20px",
-                right: "-20px",
-                transform: "rotate(-12deg)",
+                width: "340px",
+                height: "400px",
+                top: "10px",
+                right: "0px",
+                transform: "rotate(-10deg)",
+                zIndex: 1,
               }}
             />
 
@@ -65,54 +66,57 @@ const HeroSection = () => {
                 backgroundColor: "hsl(var(--primary))",
                 width: "80px",
                 height: "80px",
-                top: "10px",
-                left: "42%",
+                top: "20px",
+                left: "40%",
+                zIndex: 3,
               }}
             />
 
-            {/* 3. Grand cercle orange (fixe, rempli) */}
+            {/* 3. Grand cercle orange (fixe) */}
             <div
               className="absolute rounded-full"
               style={{
                 backgroundColor: "hsl(var(--accent))",
-                opacity: 0.35,
-                width: "240px",
-                height: "240px",
-                bottom: "-30px",
-                left: "20px",
+                opacity: 0.3,
+                width: "260px",
+                height: "260px",
+                bottom: "0px",
+                left: "10px",
+                zIndex: 1,
               }}
             />
 
-            {/* 4. Photo étudiant - fixe, au centre */}
+            {/* 4. Photo étudiant — bien cadrée, pas coupée */}
             <div
-              className="absolute z-10 rounded-xl overflow-hidden"
+              className="absolute overflow-hidden"
               style={{
                 left: "50%",
-                top: "45%",
-                transform: "translate(-50%, -50%)",
-                width: "260px",
-                height: "350px",
+                bottom: "0px",
+                transform: "translateX(-50%)",
+                width: "280px",
+                height: "480px",
+                zIndex: 2,
               }}
             >
               <img
                 src={studentHero}
                 alt="Étudiant IFRI"
-                className="w-full h-full object-cover"
-                style={{ objectPosition: "center 15%" }}
+                className="w-full h-full object-contain object-bottom"
               />
             </div>
 
             {/* 5. Grille de points orange — coin inférieur droit */}
-            <div className="absolute bottom-4 right-4 z-20">
+            <div className="absolute bottom-8 right-4" style={{ zIndex: 4 }}>
               <DotGrid color="hsl(var(--accent))" />
             </div>
 
             {/* 6. Cercle outline vert pointillé — haut droite */}
             <div
-              className="absolute z-5"
+              className="absolute"
               style={{
                 top: "30px",
-                right: "60px",
+                right: "50px",
+                zIndex: 4,
               }}
             >
               <svg width="60" height="60" viewBox="0 0 60 60">
