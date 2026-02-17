@@ -73,7 +73,7 @@ const HeroSection = () => {
                 height: "70px",
                 top: "5px",
                 left: "28%",
-                zIndex: 3,
+                zIndex: 0,
               }}
             />
 
@@ -115,7 +115,7 @@ const HeroSection = () => {
                 top: "20px",
                 transform: "translateX(-50%)",
                 width: "250px",
-                height: "420px",
+                height: "380px",
                 zIndex: 2,
                 overflow: "hidden",
                 borderRadius: "8px",
