@@ -88,16 +88,17 @@ const HeroSection = () => {
               className="absolute z-10 rounded-xl overflow-hidden"
               style={{
                 left: "50%",
-                top: "50%",
+                top: "45%",
                 transform: "translate(-50%, -50%)",
-                width: "240px",
-                height: "320px",
+                width: "260px",
+                height: "350px",
               }}
             >
               <img
                 src={studentHero}
                 alt="Étudiant IFRI"
-                className="w-full h-full object-cover object-top"
+                className="w-full h-full object-cover"
+                style={{ objectPosition: "center 15%" }}
               />
             </div>
 
