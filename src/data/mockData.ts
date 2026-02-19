@@ -10,6 +10,15 @@ export const currentUser = {
   role: "etudiant" as const,
 };
 
+export const registeredUsers = [
+  {
+    email: "marcel.ahouandjinou@ifri.uac.bj",
+    password: "password123",
+    nom: "AHOUANDJINOU",
+    prenom: "Marcel"
+  }
+];
+
 export const resources = [
   { id: "1", titre: "Algorithmique Avancée - Cours Complet", type: "Cours" as const, matiere: "Algorithmique", enseignant: "Prof. GANGBE", date: "2026-02-10", pages: 45, taille: "2.3 MB", telechargements: 234, filiere: "Génie Logiciel", promotion: "L3", semestre: "S2", format: "PDF", nouveau: true },
   { id: "2", titre: "Examen Final - Base de Données", type: "Examen" as const, matiere: "Base de Données", enseignant: "Dr. HOUNKPATIN", date: "2026-01-15", pages: 8, taille: "450 KB", telechargements: 567, filiere: "Génie Logiciel", promotion: "L3", semestre: "S1", format: "PDF", nouveau: false },
@@ -23,12 +32,66 @@ export const resources = [
 ];
 
 export const projets = [
-  { id: "1", titre: "Application de Gestion Scolaire", description: "Développer une application web complète pour la gestion des notes, absences et emplois du temps d'un établissement scolaire.", difficulte: "Intermédiaire" as const, technologies: ["React", "Node.js", "PostgreSQL"], duree: "4 semaines", ressources: 8, etudiants: 45, note: 4.5, progression: 65, image: "" },
-  { id: "2", titre: "Chatbot IA pour l'orientation", description: "Créer un chatbot intelligent capable de guider les étudiants dans leur choix de filière à l'IFRI.", difficulte: "Avancé" as const, technologies: ["Python", "TensorFlow", "Flask"], duree: "6 semaines", ressources: 12, etudiants: 28, note: 4.8, progression: 0, image: "" },
-  { id: "3", titre: "Site E-commerce Mobile First", description: "Concevoir et développer un site e-commerce responsive avec panier, paiement et gestion des commandes.", difficulte: "Débutant" as const, technologies: ["HTML", "CSS", "JavaScript"], duree: "3 semaines", ressources: 5, etudiants: 67, note: 4.2, progression: 100, image: "" },
-  { id: "4", titre: "Système de Détection d'Intrusion", description: "Implémenter un IDS basé sur le machine learning pour détecter les attaques réseau en temps réel.", difficulte: "Avancé" as const, technologies: ["Python", "Scikit-learn", "Wireshark"], duree: "8 semaines", ressources: 15, etudiants: 19, note: 4.7, progression: 30, image: "" },
-  { id: "5", titre: "API REST pour Bibliothèque", description: "Développer une API RESTful complète pour gérer le catalogue et les emprunts d'une bibliothèque universitaire.", difficulte: "Intermédiaire" as const, technologies: ["Java", "Spring Boot", "MySQL"], duree: "3 semaines", ressources: 6, etudiants: 52, note: 4.3, progression: 0, image: "" },
-  { id: "6", titre: "Application IoT - Capteurs", description: "Créer un dashboard de monitoring pour des capteurs IoT avec alertes en temps réel et historique.", difficulte: "Intermédiaire" as const, technologies: ["Arduino", "MQTT", "React"], duree: "5 semaines", ressources: 10, etudiants: 34, note: 4.4, progression: 45, image: "" },
+  {
+    id: "1",
+    titre: "Programmation C++ Avancée avec Qt",
+    description: "Maîtrisez le développement d'interfaces graphiques professionnelles et la gestion d'événements avec le framework Qt.",
+    difficulte: "Intermédiaire" as const,
+    stack: ["C++", "Qt 6", "QML", "CMake"],
+    apis: ["Qt Widgets API", "Qt Network", "Qt Multimedia"],
+    liens: [
+      { label: "Documentation Officielle Qt", url: "https://doc.qt.io/" },
+      { label: "Vogella Qt Tutorials", url: "https://www.vogella.com/tutorials/Qt/article.html" }
+    ],
+    etapes: [
+      "Installer le setup Qt 6.5 (inclus dans le zip)",
+      "Configurer l'environnement via le support de cours PDF",
+      "Ouvrir le projet témoin 'QtHospital' pour tester la configuration",
+      "Consulter les slides de cours pour les concepts de Signaux & Slots"
+    ],
+    zipUrl: "/resources/cpp-qt-pack.zip",
+    image: ""
+  },
+  {
+    id: "2",
+    titre: "Architecture Microservices avec Spring Boot",
+    description: "Guide complet pour concevoir des systèmes distribués, scalables et résilients en Java.",
+    difficulte: "Avancé" as const,
+    stack: ["Java 17", "Spring Cloud", "Docker", "Netflix Eureka"],
+    apis: ["OpenAPI/Swagger", "Resilience4j", "Spring Security OAuth2"],
+    liens: [
+      { label: "Spring Cloud Reference", url: "https://spring.io/projects/spring-cloud" },
+      { label: "Microservices.io Patterns", url: "https://microservices.io/patterns/index.html" }
+    ],
+    etapes: [
+      "Télécharger le socle de projet Maven",
+      "Lancer l'instance Eureka via Docker Compose",
+      "Suivre le tutoriel d'intégration API Gateway",
+      "Implémenter le circuit breaker sur le service 'Order'"
+    ],
+    zipUrl: "/resources/microservices-spring-pack.zip",
+    image: ""
+  },
+  {
+    id: "3",
+    titre: "Bases du Développement Web Moderne",
+    description: "Apprenez à construire des sites statiques et dynamiques en suivant les standards du W3C.",
+    difficulte: "Débutant" as const,
+    stack: ["HTML5", "CSS3", "JavaScript ES6", "Tailwind CSS"],
+    apis: ["Local Storage API", "Fetch API", "Google Fonts"],
+    liens: [
+      { label: "MDN Web Docs", url: "https://developer.mozilla.org/" },
+      { label: "Tailwind CSS Documentation", url: "https://tailwindcss.com/docs" }
+    ],
+    etapes: [
+      "Étudier les structures HTML sémantiques",
+      "Appliquer les styles via le framework Tailwind",
+      "Manipuler le DOM avec du JavaScript pur",
+      "Déployer le résultat sur GitHub Pages"
+    ],
+    zipUrl: "/resources/web-basics-pack.zip",
+    image: ""
+  }
 ];
 
 export const emploiDuTemps = [

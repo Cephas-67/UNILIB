@@ -1,6 +1,6 @@
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { Link } from "react-router-dom";
-import studentHero from "@/assets/student-hero.png";
+import studentHero from "@/assets/retouch_2026021720400735.png";
 
 const DotGrid = ({ color }: { color: string }) => (
   <div className="grid grid-cols-4 gap-[6px]">
@@ -12,7 +12,7 @@ const DotGrid = ({ color }: { color: string }) => (
 
 const HeroSection = () => {
   return (
-    <section id="accueil" className="relative overflow-hidden bg-background py-16 lg:py-24">
+    <section id="accueil" className="relative overflow-hidden bg-background pt-28 pb-16 lg:pt-36 lg:pb-24">
       <div className="container mx-auto px-6 lg:px-12">
         <div className="flex flex-col lg:flex-row items-center gap-12">
           {/* Grille de points bleus — haut gauche de la page */}
@@ -32,113 +32,127 @@ const HeroSection = () => {
             </p>
 
             <div className="flex flex-wrap gap-4">
-              <Link
-                to="/e-fri/ressources"
+              <a
+                href="#ecoles"
                 className="inline-flex items-center gap-2 rounded-lg bg-accent px-6 py-3 font-inter text-sm font-medium text-accent-foreground hover:bg-accent-hover transition-colors"
+                onClick={(e) => {
+                  e.preventDefault();
+                  document.getElementById('ecoles')?.scrollIntoView({ behavior: 'smooth' });
+                }}
               >
                 Accéder aux épreuves
                 <ArrowUpRight size={16} />
-              </Link>
-              <Link
-                to="/e-fri/inscription"
+              </a>
+              <a
+                href="#ecoles"
                 className="inline-flex items-center gap-2 rounded-lg border border-accent px-6 py-3 font-inter text-sm font-medium text-accent hover:bg-accent hover:text-accent-foreground transition-colors"
+                onClick={(e) => {
+                  e.preventDefault();
+                  document.getElementById('ecoles')?.scrollIntoView({ behavior: 'smooth' });
+                }}
               >
                 Créer mon compte
-              </Link>
+              </a>
             </div>
           </div>
 
-          {/* Right column - Photo + Decorative shapes */}
-          <div className="flex-1 relative h-[460px] lg:h-[500px] w-full max-w-[480px]">
-            {/* 1. Grand rectangle arrondi bleu — centré derrière la photo */}
+          {/* Right column - Photo + Decorative shapes (Refined with Blue, Orange, Green) */}
+          <div className="flex-1 relative h-[500px] lg:h-[550px] w-full max-w-[550px] flex items-center justify-center">
+            {/* 1. Blue Card (Main background) - Frames the student */}
             <div
-              className="absolute rounded-[32px]"
+              className="absolute rounded-[40px] shadow-lg animate-in fade-in zoom-in duration-700"
               style={{
-                backgroundColor: "hsl(var(--secondary))",
-                width: "300px",
-                height: "360px",
-                top: "0px",
-                left: "50%",
-                transform: "translateX(-45%) rotate(-10deg)",
+                backgroundColor: "hsl(var(--secondary))", // Blue
+                width: "320px",
+                height: "380px",
+                top: "120px",
+                right: "30px",
+                transform: "rotate(10deg)",
                 zIndex: 1,
               }}
             />
 
-            {/* 2. Cercle vert (animé) — en haut, ne cache pas le visage */}
+            {/* 2. Orange Circle (Bottom left overlap) - Floating */}
             <div
-              className="absolute rounded-full animate-hero-float-green"
+              className="absolute rounded-full shadow-md animate-hero-float-orange"
               style={{
-                backgroundColor: "hsl(var(--primary))",
+                backgroundColor: "rgba(255, 152, 0, 0.25)", // Translucent Orange
+                border: "2px solid hsl(var(--accent))",
+                width: "200px",
+                height: "200px",
+                bottom: "20px",
+                left: "10px",
+                zIndex: 4,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center"
+              }}
+            >
+              {/* Smiley icon inside orange circle */}
+              <div className="w-8 h-8 rounded-full border-2 border-[hsl(var(--accent))] flex items-center justify-center">
+                <div className="w-1.5 h-1.5 rounded-full bg-[hsl(var(--accent))] mr-1" />
+                <div className="w-1.5 h-1.5 rounded-full bg-[hsl(var(--accent))]" />
+              </div>
+            </div>
+
+            {/* 3. Green Circle (Top left overlay) - Floating */}
+            <div
+              className="absolute rounded-full shadow-sm animate-hero-float-green"
+              style={{
+                backgroundColor: "hsl(var(--primary))", // Green
                 width: "70px",
                 height: "70px",
-                top: "5px",
-                left: "28%",
+                top: "120px",
+                left: "50px",
                 zIndex: 0,
               }}
             />
 
-            {/* 3. Grand cercle orange — bas centre, accompagne la photo */}
+            {/* 4. Small Blue Circle (Accent right) - Floating */}
             <div
-              className="absolute rounded-full"
+              className="absolute rounded-full shadow-sm animate-hero-float-blue"
               style={{
-                backgroundColor: "hsl(var(--accent))",
-                opacity: 0.3,
-                width: "240px",
-                height: "240px",
-                bottom: "-40px",
-                left: "50%",
-                transform: "translateX(-60%)",
-                zIndex: 3,
+                backgroundColor: "hsl(var(--secondary))", // Blue
+                width: "40px",
+                height: "40px",
+                bottom: "150px",
+                right: "0px",
+                zIndex: 0,
               }}
             />
 
-            {/* 4. Cercle outline — superposé */}
-            <div
-              className="absolute rounded-full"
-              style={{
-                border: "1.5px solid hsl(var(--accent))",
-                opacity: 0.4,
-                width: "180px",
-                height: "180px",
-                bottom: "10px",
-                left: "50%",
-                transform: "translateX(-80%)",
-                zIndex: 3,
-              }}
-            />
-
-            {/* 5. Photo étudiant — centrée sur la carte bleue */}
-            <div
-              className="absolute"
-              style={{
-                left: "50%",
-                top: "20px",
-                transform: "translateX(-50%)",
-                width: "250px",
-                height: "380px",
-                zIndex: 2,
-                overflow: "hidden",
-                borderRadius: "8px",
-              }}
-            >
-              <img
-                src={studentHero}
-                alt="Étudiant IFRI"
-                className="w-full h-full object-cover"
-                style={{ objectPosition: "center 10%" }}
-              />
-            </div>
-
-            {/* 6. Points orange — bas droite */}
-            <div className="absolute bottom-4 right-0" style={{ zIndex: 5 }}>
-              <DotGrid color="hsl(var(--accent))" />
-            </div>
-
-            {/* 7. Tirets verts pointillés — haut droite */}
-            <div className="absolute" style={{ top: "10px", right: "20px", zIndex: 5 }}>
-              <svg width="50" height="50" viewBox="0 0 50 50" opacity="0.5">
-                <circle cx="25" cy="25" r="20" fill="none" stroke="hsl(var(--primary))" strokeWidth="1.5" strokeDasharray="4 3" />
+            {/* 5. Decorative wavy lines (SVG) - Orange */}
+            <div className="absolute top-[100px] left-[30px] z-10 opacity-70">
+              <svg width="60" height="30" viewBox="0 0 60 30" fill="none">
+                <path d="M5 25C15 10 25 10 35 25C45 40 55 40 65 25" stroke="hsl(var(--accent))" strokeWidth="3" strokeLinecap="round" />
               </svg>
+            </div>
+
+            {/* 6. Main Student Image - Floating and animated */}
+            <div className="absolute inset-x-0 bottom-0 flex justify-center items-end z-[3]">
+              <div className="relative w-[280px] h-[420px] lg:w-[320px] lg:h-[480px] animate-in fade-in slide-in-from-bottom duration-1000">
+                <img
+                  src={studentHero}
+                  alt="Étudiant UniLib"
+                  className="w-full h-full object-contain drop-shadow-2xl animate-hero-float"
+                  loading="lazy"
+                />
+              </div>
+            </div>
+
+            {/* 7. Floating "Smiley" bubbles - Orange and Blue */}
+            <div className="absolute top-[60px] right-[20px] z-10 bg-white/90 p-2 rounded-full shadow-lg border border-gray-100 animate-hero-float-blue">
+              <div className="w-5 h-5 rounded-full border-2 border-[hsl(var(--secondary))] flex items-center justify-center">
+                <div className="w-1.5 h-1.5 rounded-full bg-[hsl(var(--secondary))] mr-0.5" />
+                <div className="w-1.5 h-1.5 rounded-full bg-[hsl(var(--secondary))]" />
+              </div>
+            </div>
+
+            <div className="absolute bottom-[200px] left-[20%] z-10 bg-white/90 p-2 rounded-full shadow-lg border border-gray-100 animate-hero-float-orange">
+              <div className="w-5 h-5 rounded-full border-2 border-[hsl(var(--accent))] flex items-center justify-center">
+                <div className="w-1.5 h-1.5 rounded-full bg-[hsl(var(--accent))] mr-0.5" />
+                <div className="w-1.5 h-1.5 rounded-full bg-[hsl(var(--accent))]" />
+              </div>
             </div>
           </div>
         </div>

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { registeredUsers } from "@/data/mockData";
 
 const EFriLogin = () => {
   const [email, setEmail] = useState("");
@@ -27,9 +28,25 @@ const EFriLogin = () => {
     if (!validate()) return;
     setLoading(true);
     await new Promise((r) => setTimeout(r, 1500));
+
+    const storedUsers = JSON.parse(localStorage.getItem("unilib_users") || "[]");
+    const allUsers = [...registeredUsers, ...storedUsers];
+    const user = allUsers.find(u => u.email === email.toLowerCase() && u.password === password);
+
     setLoading(false);
-    toast({ title: "Connexion réussie", description: "Bienvenue sur e-FRI !" });
-    navigate("/e-fri/dashboard");
+
+    if (user) {
+      localStorage.setItem("unilib_session", JSON.stringify(user));
+      toast({ title: "Connexion réussie", description: `Ravi de vous revoir, ${user.prenom} !` });
+      navigate("/e-fri/dashboard");
+    } else {
+      toast({
+        title: "Erreur de connexion",
+        description: "Email ou mot de passe incorrect.",
+        variant: "destructive"
+      });
+      setErrors({ email: "Identifiants invalides" });
+    }
   };
 
   return (
@@ -84,9 +101,8 @@ const EFriLogin = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="votre.email@ifri.uac.bj"
-                  className={`w-full pl-10 pr-4 py-3 rounded-lg border font-inter text-sm text-foreground bg-background outline-none transition-colors ${
-                    errors.email ? "border-destructive border-2" : "border-input focus:border-secondary focus:border-2"
-                  }`}
+                  className={`w-full pl-10 pr-4 py-3 rounded-lg border font-inter text-sm text-foreground bg-background outline-none transition-colors ${errors.email ? "border-destructive border-2" : "border-input focus:border-secondary focus:border-2"
+                    }`}
                 />
               </div>
               {errors.email && <p className="font-inter text-xs text-destructive mt-1">{errors.email}</p>}
@@ -101,9 +117,8 @@ const EFriLogin = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className={`w-full pl-10 pr-12 py-3 rounded-lg border font-inter text-sm text-foreground bg-background outline-none transition-colors ${
-                    errors.password ? "border-destructive border-2" : "border-input focus:border-secondary focus:border-2"
-                  }`}
+                  className={`w-full pl-10 pr-12 py-3 rounded-lg border font-inter text-sm text-foreground bg-background outline-none transition-colors ${errors.password ? "border-destructive border-2" : "border-input focus:border-secondary focus:border-2"
+                    }`}
                 />
                 <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}

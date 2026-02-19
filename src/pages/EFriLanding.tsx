@@ -1,19 +1,8 @@
 import { Link } from "react-router-dom";
 import { ArrowUpRight, Database, Clock, Users, Sparkles } from "lucide-react";
+import EFriLogo from "@/components/EFriLogo";
 
-const EFriLogo = () => (
-  <div className="flex items-center gap-2">
-    <svg width="32" height="32" viewBox="0 0 40 40" fill="none">
-      <circle cx="16" cy="24" r="12" fill="#3D5AFE" opacity="0.85" />
-      <circle cx="24" cy="24" r="12" fill="#FF9800" opacity="0.75" />
-      <circle cx="20" cy="14" r="12" fill="#69F0AE" opacity="0.8" />
-    </svg>
-    <span className="font-poppins text-xl">
-      <span className="font-medium text-muted-foreground">e-</span>
-      <span className="font-bold text-foreground">FRI</span>
-    </span>
-  </div>
-);
+import logoifri from "@/assets/logoifri.png";
 
 const stats = [
   { value: "500+", label: "ressources" },
@@ -28,6 +17,16 @@ const features = [
   { icon: Users, color: "#FF9800", title: "Collaboration", description: "Partagez vos ressources et contribuez à enrichir la bibliothèque commune." },
   { icon: Sparkles, color: "#2196F3", title: "IA Intégrée", description: "Un assistant intelligent pour vous aider dans vos révisions et projets." },
 ];
+
+import studentHero from "@/assets/student-efri.png";
+
+const DotGrid = ({ color }: { color: string }) => (
+  <div className="grid grid-cols-4 gap-[6px]">
+    {Array.from({ length: 16 }).map((_, i) => (
+      <div key={i} className="w-[5px] h-[5px] rounded-full" style={{ backgroundColor: color }} />
+    ))}
+  </div>
+);
 
 const EFriLanding = () => {
   return (
@@ -61,25 +60,123 @@ const EFriLanding = () => {
         <section className="relative overflow-hidden bg-background py-16 lg:py-24">
           <div className="container mx-auto px-6 lg:px-12">
             <div className="flex flex-col lg:flex-row items-center gap-12">
-              <div className="flex-1 lg:max-w-[55%]">
-                <h1 className="font-poppins font-bold text-4xl lg:text-5xl text-foreground leading-tight mb-4">
+              {/* Grille de points bleus — haut gauche */}
+              <div className="absolute top-20 left-8 lg:left-12 opacity-50" style={{ zIndex: 5 }}>
+                <DotGrid color="hsl(var(--secondary))" />
+              </div>
+
+              {/* Left column - Text */}
+              <div className="flex-1 lg:max-w-[55%] relative z-10 pt-12">
+                <h1 className="font-poppins font-bold text-4xl lg:text-5xl text-foreground leading-tight mb-4 animate-in fade-in slide-in-from-left duration-700">
                   Votre bibliothèque académique centralisée
                 </h1>
-                <p className="font-inter text-sm text-muted-foreground mb-8 max-w-md leading-relaxed">
+                <p className="font-inter text-sm text-muted-foreground mb-8 max-w-md leading-relaxed animate-in fade-in slide-in-from-left duration-700 delay-100">
                   Cours, TDs, TPs, examens et projets — tout ce dont vous avez besoin pour réussir à l'IFRI
                 </p>
                 <Link
                   to="/e-fri/connexion"
-                  className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 font-inter text-sm font-medium text-primary-foreground hover:bg-primary-hover transition-colors"
+                  className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 font-inter text-sm font-medium text-primary-foreground hover:bg-primary-hover transition-all hover:scale-105 duration-300 animate-in fade-in slide-in-from-left duration-700 delay-200"
                 >
                   Accéder à la plateforme
                   <ArrowUpRight size={16} />
                 </Link>
               </div>
-              <div className="flex-1 relative h-[400px] w-full">
-                <div className="absolute top-0 right-0 w-[320px] h-[280px] rounded-[32px]" style={{ backgroundColor: "#5C6BC0", transform: "rotate(-5deg)" }} />
-                <div className="absolute w-16 h-16 rounded-full" style={{ backgroundColor: "#A5D6A7", top: "40px", left: "60px" }} />
-                <div className="absolute w-40 h-40 rounded-full" style={{ border: "1.5px solid #EF9A9A", backgroundColor: "rgba(239,154,154,0.15)", bottom: "40px", left: "40px" }} />
+
+              {/* Right column - Photo + Decorative shapes */}
+              <div className="flex-1 relative h-[500px] lg:h-[550px] w-full max-w-[550px] flex items-center justify-center">
+                {/* 1. Blue Card (Main background) */}
+                <div
+                  className="absolute rounded-[40px] shadow-lg animate-in fade-in zoom-in duration-1000"
+                  style={{
+                    backgroundColor: "hsl(var(--secondary))",
+                    width: "320px",
+                    height: "380px",
+                    top: "80px",
+                    right: "30px",
+                    transform: "rotate(10deg)",
+                    zIndex: 1,
+                  }}
+                />
+
+                {/* 2. Orange Circle (Overlap) */}
+                <div
+                  className="absolute rounded-full shadow-md animate-hero-float-orange"
+                  style={{
+                    backgroundColor: "rgba(255, 152, 0, 0.25)",
+                    border: "2px solid hsl(var(--accent))",
+                    width: "200px",
+                    height: "200px",
+                    bottom: "20px",
+                    left: "10px",
+                    zIndex: 4,
+                  }}
+                />
+
+                {/* 3. Green Circle */}
+                <div
+                  className="absolute rounded-full shadow-sm animate-hero-float-green"
+                  style={{
+                    backgroundColor: "hsl(var(--primary))",
+                    width: "70px",
+                    height: "70px",
+                    top: "120px",
+                    left: "50px",
+                    zIndex: 0,
+                  }}
+                />
+
+                {/* 4. Small Blue Circle */}
+                <div
+                  className="absolute rounded-full shadow-sm animate-hero-float-blue"
+                  style={{
+                    backgroundColor: "hsl(var(--secondary))",
+                    width: "40px",
+                    height: "40px",
+                    bottom: "150px",
+                    right: "0px",
+                    zIndex: 0,
+                  }}
+                />
+
+                {/* 5. Decorative wavy lines */}
+                <div className="absolute top-[100px] left-[30px] z-10 opacity-70">
+                  <svg width="60" height="30" viewBox="0 0 60 30" fill="none">
+                    <path d="M5 25C15 10 25 10 35 25C45 40 55 40 65 25" stroke="hsl(var(--accent))" strokeWidth="3" strokeLinecap="round" />
+                  </svg>
+                </div>
+
+                {/* 6. Student Photo Container */}
+                <div
+                  className="absolute"
+                  style={{
+                    width: "320px",
+                    height: "480px",
+                    top: "-20px",
+                    right: "40px",
+                    zIndex: 3,
+                    pointerEvents: "none",
+                  }}
+                >
+                  <img
+                    src={studentHero}
+                    alt="Étudiant IFRI"
+                    className="w-full h-full object-contain"
+                    style={{
+                      objectPosition: "center top",
+                      filter: "drop-shadow(0 20px 30px rgba(0,0,0,0.15))",
+                      maskImage: "linear-gradient(to bottom, black 90%, transparent 100%)",
+                      WebkitMaskImage: "linear-gradient(to bottom, black 90%, transparent 100%)",
+                    }}
+                  />
+                </div>
+
+                {/* 7. Floating "Smiley" bubbles */}
+                <div className="absolute top-[60px] right-[20px] z-10 bg-white/90 p-2 rounded-full shadow-lg border border-gray-100 animate-hero-float-blue">
+                  <div className="w-5 h-5 rounded-full border-2 border-[hsl(var(--secondary))] flex items-center justify-center">
+                    <div className="w-1.5 h-1.5 rounded-full bg-[hsl(var(--secondary))] mr-0.5" />
+                    <div className="w-1.5 h-1.5 rounded-full bg-[hsl(var(--secondary))]" />
+                  </div>
+                </div>
               </div>
             </div>
           </div>

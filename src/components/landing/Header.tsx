@@ -1,12 +1,17 @@
 import { Link } from "react-router-dom";
 import UniLibLogo from "../UniLibLogo";
+import logoUac from "@/assets/logouac.png";
 
 const Header = () => {
   return (
-    <header className="sticky top-0 z-50 bg-background shadow-sm">
-      <div className="container mx-auto flex h-16 items-center justify-between px-6 lg:px-12">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
+      <div className="container mx-auto px-6 lg:px-12 h-20 flex items-center justify-between">
         <Link to="/">
-          <UniLibLogo />
+          <div className="flex items-center gap-4">
+            <UniLibLogo />
+            <div className="h-8 w-px bg-border hidden sm:block" />
+            <img src={logoUac} alt="UAC" className="h-10 object-contain hidden sm:block" />
+          </div>
         </Link>
 
         <nav className="hidden md:flex items-center gap-8">
@@ -21,12 +26,6 @@ const Header = () => {
           </a>
         </nav>
 
-        <Link
-          to="/e-fri/connexion"
-          className="rounded-lg border border-border px-5 py-2 font-inter text-sm text-foreground hover:bg-muted transition-colors"
-        >
-          Se connecter
-        </Link>
       </div>
     </header>
   );

@@ -53,22 +53,39 @@ const EFriSignup = () => {
     if (!validate()) return;
     setLoading(true);
     await new Promise((r) => setTimeout(r, 1500));
+
+    // Simuler l'enregistrement (localStorage persistence)
+    const newUser = {
+      email: form.email.toLowerCase(),
+      password: form.password,
+      nom: form.nom,
+      prenom: form.prenom,
+      filiere: form.filiere,
+      promotion: form.promotion,
+      semestre: form.semestre,
+      role: "etudiant" as const
+    };
+
+    const existingUsers = JSON.parse(localStorage.getItem("unilib_users") || "[]");
+    localStorage.setItem("unilib_users", JSON.stringify([...existingUsers, newUser]));
+
     setLoading(false);
-    toast({ title: "Inscription réussie", description: "Votre compte a été créé avec succès !" });
-    navigate("/e-fri/dashboard");
+    toast({
+      title: "Inscription réussie",
+      description: "Votre compte a été créé. Vous pouvez maintenant vous connecter !"
+    });
+    navigate("/e-fri/connexion");
   };
 
   const strength = getPasswordStrength(form.password);
   const isFormValid = form.nom && form.prenom && form.email && form.filiere && form.promotion && form.semestre && form.password && form.confirmPassword && form.cgu;
 
   const inputClass = (field: string) =>
-    `w-full px-4 py-3 rounded-lg border font-inter text-sm text-foreground bg-background outline-none transition-colors ${
-      errors[field] ? "border-destructive border-2" : "border-input focus:border-secondary focus:border-2"
+    `w-full px-4 py-3 rounded-lg border font-inter text-sm text-foreground bg-background outline-none transition-colors ${errors[field] ? "border-destructive border-2" : "border-input focus:border-secondary focus:border-2"
     }`;
 
   const selectClass = (field: string) =>
-    `w-full px-4 py-3 rounded-lg border font-inter text-sm text-foreground bg-background outline-none transition-colors appearance-none ${
-      errors[field] ? "border-destructive border-2" : "border-input focus:border-secondary focus:border-2"
+    `w-full px-4 py-3 rounded-lg border font-inter text-sm text-foreground bg-background outline-none transition-colors appearance-none ${errors[field] ? "border-destructive border-2" : "border-input focus:border-secondary focus:border-2"
     }`;
 
   return (

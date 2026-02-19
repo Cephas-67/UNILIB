@@ -73,35 +73,64 @@ const EFriResources = () => {
       {/* Results */}
       <p className="font-inter text-sm text-muted-foreground">{filtered.length} résultat(s)</p>
 
-      <div className={viewMode === "grid" ? "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4" : "space-y-3"}>
+      <div className={viewMode === "grid" ? "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6" : "space-y-4"}>
         {filtered.map(r => (
-          <div key={r.id} className="bg-background rounded-xl border border-border p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all">
-            <div className="flex items-start gap-3 mb-3">
-              <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: formatIcons[r.format] || "#9E9E9E" }}>
-                <FileText size={20} className="text-white" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className={`px-2 py-0.5 rounded text-[11px] font-inter font-medium ${typeColors[r.type]}`}>{r.type}</span>
-                  {r.nouveau && <span className="px-2 py-0.5 rounded text-[11px] font-inter font-medium bg-accent text-accent-foreground">Nouveau</span>}
+          <div key={r.id} className="group bg-background rounded-2xl border border-border overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+            {/* Card Header with Type-based Color Accent */}
+            <div className={`h-1.5 w-full ${typeColors[r.type as keyof typeof typeColors].split(' ')[0]}`} />
+
+            <div className="p-5 space-y-4">
+              <div className="flex items-start justify-between gap-4">
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-110 duration-300 ${typeColors[r.type as keyof typeof typeColors]}`}>
+                  <FileText size={24} />
                 </div>
-                <h3 className="font-poppins font-medium text-[15px] text-foreground line-clamp-2">{r.titre}</h3>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${typeColors[r.type as keyof typeof typeColors]}`}>
+                      {r.type}
+                    </span>
+                  </div>
+                  <h3 className="font-poppins font-bold text-base text-foreground line-clamp-2 leading-tight group-hover:text-secondary transition-colors italic">
+                    {r.titre}
+                  </h3>
+                </div>
               </div>
-            </div>
 
-            <div className="space-y-1 mb-4">
-              <p className="font-inter text-xs text-muted-foreground">📚 {r.matiere} · 👨‍🏫 {r.enseignant}</p>
-              <p className="font-inter text-xs text-muted-foreground">📅 {r.date} · 📄 {r.pages} pages · 💾 {r.taille}</p>
-              <p className="font-inter text-xs text-muted-foreground">⬇️ {r.telechargements} téléchargements</p>
-            </div>
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <div className="w-1 h-1 rounded-full bg-secondary" />
+                  <p className="font-inter text-xs font-semibold text-muted-foreground uppercase">{r.matiere}</p>
+                </div>
 
-            <div className="flex items-center gap-2">
-              <button className="flex-1 flex items-center justify-center gap-2 py-2 rounded-lg bg-primary text-primary-foreground font-inter text-xs font-medium hover:opacity-90 transition-opacity">
-                <Download size={14} /> Télécharger
-              </button>
-              <button className="p-2 rounded-lg border border-border text-muted-foreground hover:text-secondary hover:border-secondary transition-colors"><Eye size={14} /></button>
-              <button className="p-2 rounded-lg border border-border text-muted-foreground hover:text-destructive hover:border-destructive transition-colors"><Heart size={14} /></button>
-              <button className="p-2 rounded-lg border border-border text-muted-foreground hover:text-secondary hover:border-secondary transition-colors"><Share2 size={14} /></button>
+                <div className="grid grid-cols-2 gap-y-2 py-3 border-y border-border/50">
+                  <div className="space-y-0.5">
+                    <p className="font-inter text-[10px] text-muted-foreground uppercase font-bold tracking-tighter">Enseignant</p>
+                    <p className="font-inter text-xs text-foreground truncate">{r.enseignant}</p>
+                  </div>
+                  <div className="space-y-0.5 text-right">
+                    <p className="font-inter text-[10px] text-muted-foreground uppercase font-bold tracking-tighter">Mis en ligne</p>
+                    <p className="font-inter text-xs text-foreground">{r.date}</p>
+                  </div>
+                  <div className="space-y-0.5">
+                    <p className="font-inter text-[10px] text-muted-foreground uppercase font-bold tracking-tighter">Volume</p>
+                    <p className="font-inter text-xs text-foreground">{r.taille} · {r.pages} p.</p>
+                  </div>
+                  <div className="space-y-0.5 text-right">
+                    <p className="font-inter text-[10px] text-muted-foreground uppercase font-bold tracking-tighter">Stats</p>
+                    <p className="font-inter text-xs text-foreground font-semibold text-secondary">{r.telechargements} DLs</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 pt-2">
+                <button className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-primary text-primary-foreground font-poppins text-xs font-bold shadow-lg shadow-primary/20 hover:opacity-90 transition-all active:scale-95">
+                  <Download size={14} /> Télécharger
+                </button>
+                <div className="flex gap-1.5">
+                  <button title="Aperçu" className="p-2.5 rounded-xl border border-border text-muted-foreground hover:text-secondary hover:border-secondary transition-all hover:bg-secondary/5"><Eye size={16} /></button>
+                  <button title="Ajouter aux favoris" className="p-2.5 rounded-xl border border-border text-muted-foreground hover:text-destructive hover:border-destructive transition-all hover:bg-destructive/5"><Heart size={16} /></button>
+                </div>
+              </div>
             </div>
           </div>
         ))}
