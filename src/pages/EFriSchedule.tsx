@@ -1,99 +1,160 @@
-import { useState } from "react";
-import { Download } from "lucide-react";
-import { emploiDuTemps } from "@/data/mockData";
-
-const jours = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi"];
-const heures = Array.from({ length: 11 }, (_, i) => i + 8); // 8h to 18h
-const typeColors = { CM: "bg-secondary/15 border-secondary text-secondary", TD: "bg-primary/15 border-primary text-primary", TP: "bg-accent/15 border-accent text-accent" };
+import { useState, useEffect, useRef } from "react";
+import { Download, Upload, FileText, X, Eye } from "lucide-react";
+import { useSession } from "@/hooks/use-session";
+import { useToast } from "@/hooks/use-toast";
 
 const EFriSchedule = () => {
-  const [view, setView] = useState<"semaine" | "mois" | "liste">("semaine");
-  const [hoveredBlock, setHoveredBlock] = useState<string | null>(null);
+  const { user } = useSession();
+  const { toast } = useToast();
+  const [pdfData, setPdfData] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Load PDF from localStorage on mount
+  useEffect(() => {
+    const savedPdf = localStorage.getItem("unilib_schedule_pdf");
+    if (savedPdf) {
+      setPdfData(savedPdf);
+    }
+  }, []);
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && file.type === "application/pdf") {
+      setIsUploading(true);
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const result = event.target?.result as string;
+        localStorage.setItem("unilib_schedule_pdf", result);
+        setPdfData(result);
+        setIsUploading(false);
+        toast({
+          title: "Emploi du temps mis à jour",
+          description: "Le nouveau document a été téléversé avec succès.",
+        });
+      };
+      reader.readAsDataURL(file);
+    } else if (file) {
+      toast({
+        title: "Format non supporté",
+        description: "Veuillez téléverser un fichier PDF.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const removePdf = () => {
+    localStorage.removeItem("unilib_schedule_pdf");
+    setPdfData(null);
+    toast({
+      title: "Document supprimé",
+      description: "L'emploi du temps a été retiré.",
+    });
+  };
+
+  const isAdmin = user?.role === "admin";
 
   return (
     <div className="space-y-6 pb-20 lg:pb-0">
       <div className="flex items-center justify-between flex-wrap gap-4">
-        <h1 className="font-poppins font-semibold text-2xl text-foreground">Emploi du Temps</h1>
+        <div>
+          <h1 className="font-poppins font-semibold text-2xl text-foreground">Emploi du Temps</h1>
+          <p className="font-inter text-sm text-muted-foreground mt-1">
+            Consultez le planning officiel fourni par l'administration
+          </p>
+        </div>
+
         <div className="flex items-center gap-3">
-          <div className="flex gap-1 bg-muted rounded-lg p-0.5">
-            {(["semaine", "mois", "liste"] as const).map(v => (
-              <button key={v} onClick={() => setView(v)} className={`px-3 py-1.5 rounded-md font-inter text-xs font-medium capitalize transition-colors ${view === v ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"}`}>{v}</button>
-            ))}
-          </div>
-          <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-accent text-accent-foreground font-inter text-sm font-medium hover:opacity-90 transition-opacity">
-            <Download size={14} /> Export
-          </button>
+          {pdfData && (
+            <a
+              href={pdfData}
+              download="Emploi_du_Temps.pdf"
+              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-accent text-accent-foreground font-inter text-sm font-medium hover:opacity-90 transition-opacity"
+            >
+              <Download size={16} /> Télécharger
+            </a>
+          )}
+
+          {isAdmin && (
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground font-inter text-sm font-medium hover:opacity-90 transition-opacity"
+            >
+              <Upload size={16} /> {pdfData ? "Mettre à jour" : "Téléverser"}
+            </button>
+          )}
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileUpload}
+            accept=".pdf"
+            className="hidden"
+          />
         </div>
       </div>
 
-      <div className="flex flex-wrap gap-3 font-inter text-xs">
-        <span className="flex items-center gap-2"><span className="w-3 h-3 rounded bg-secondary/30" /> CM</span>
-        <span className="flex items-center gap-2"><span className="w-3 h-3 rounded bg-primary/30" /> TD</span>
-        <span className="flex items-center gap-2"><span className="w-3 h-3 rounded bg-accent/30" /> TP</span>
+      <div className="bg-background rounded-2xl border border-border shadow-sm overflow-hidden min-h-[600px] flex flex-col">
+        {pdfData ? (
+          <div className="flex-1 flex flex-col">
+            <div className="bg-muted/30 p-3 border-b border-border flex items-center justify-between">
+              <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+                <FileText size={18} className="text-primary" />
+                <span>Emploi_du_Temps_Officiel.pdf</span>
+              </div>
+              {isAdmin && (
+                <button
+                  onClick={removePdf}
+                  className="p-2 hover:bg-destructive/10 text-destructive rounded-lg transition-colors"
+                  title="Supprimer le document"
+                >
+                  <X size={18} />
+                </button>
+              )}
+            </div>
+            <div className="flex-1 w-full bg-muted/10">
+              <iframe
+                src={pdfData}
+                className="w-full h-full min-h-[700px] border-none"
+                title="Emploi du temps PDF"
+              />
+            </div>
+          </div>
+        ) : (
+          <div className="flex-1 flex flex-col items-center justify-center p-12 text-center space-y-6">
+            <div className="w-20 h-20 rounded-2xl bg-muted fill-muted-foreground flex items-center justify-center">
+              <FileText size={40} className="text-muted-foreground/40" />
+            </div>
+            <div className="max-w-md space-y-2">
+              <h3 className="font-poppins font-semibold text-xl text-foreground">Aucun emploi du temps</h3>
+              <p className="font-inter text-sm text-muted-foreground">
+                L'administration n'a pas encore publié d'emploi du temps pour cette période.
+              </p>
+            </div>
+
+            {isAdmin && (
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="flex items-center gap-2 px-6 py-3 rounded-xl bg-primary text-primary-foreground font-inter text-sm font-bold shadow-lg shadow-primary/20 hover:scale-105 transition-all"
+              >
+                <Upload size={18} /> Téléverser le planning (PDF)
+              </button>
+            )}
+          </div>
+        )}
       </div>
 
-      {view === "semaine" && (
-        <div className="bg-background rounded-xl border border-border shadow-sm overflow-x-auto">
-          <div className="min-w-[800px]">
-            {/* Header */}
-            <div className="grid grid-cols-[80px_repeat(5,1fr)] border-b border-border">
-              <div className="p-3" />
-              {jours.map(j => (
-                <div key={j} className="p-3 text-center font-poppins font-medium text-sm text-foreground border-l border-border">{j}</div>
-              ))}
-            </div>
-
-            {/* Time grid */}
-            {heures.map(h => (
-              <div key={h} className="grid grid-cols-[80px_repeat(5,1fr)] border-b border-border last:border-0 min-h-[60px]">
-                <div className="p-2 font-inter text-xs text-muted-foreground flex items-start justify-end pr-3 pt-1">{h}h</div>
-                {jours.map((_, jourIdx) => {
-                  const block = emploiDuTemps.find(e => e.jour === jourIdx && e.heureDebut === h);
-                  return (
-                    <div key={jourIdx} className="border-l border-border relative p-0.5">
-                      {block && (
-                        <div
-                          className={`rounded-lg border-l-[3px] p-2 text-xs cursor-pointer transition-shadow ${typeColors[block.type]} ${hoveredBlock === `${jourIdx}-${h}` ? "shadow-md" : ""}`}
-                          style={{ height: `${(block.heureFin - block.heureDebut) * 60 - 4}px`, minHeight: "56px" }}
-                          onMouseEnter={() => setHoveredBlock(`${jourIdx}-${h}`)}
-                          onMouseLeave={() => setHoveredBlock(null)}
-                        >
-                          <p className="font-poppins font-medium text-[11px] leading-tight">{block.matiere}</p>
-                          <p className="font-inter text-[10px] opacity-70 mt-0.5">{block.type} · {block.salle}</p>
-                          {hoveredBlock === `${jourIdx}-${h}` && (
-                            <p className="font-inter text-[10px] opacity-60 mt-0.5">{block.enseignant} · {block.heureDebut}h-{block.heureFin}h</p>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            ))}
-          </div>
+      <div className="bg-secondary/5 rounded-xl border border-secondary/10 p-4 flex gap-4 items-start">
+        <div className="p-2 bg-secondary/10 rounded-lg text-secondary flex-shrink-0">
+          <Eye size={18} />
         </div>
-      )}
-
-      {view === "liste" && (
-        <div className="space-y-2">
-          {emploiDuTemps.sort((a, b) => a.jour - b.jour || a.heureDebut - b.heureDebut).map((e, i) => (
-            <div key={i} className="bg-background rounded-xl border border-border p-4 shadow-sm flex items-center gap-4">
-              <div className={`w-1 h-12 rounded-full ${e.type === "CM" ? "bg-secondary" : e.type === "TD" ? "bg-primary" : "bg-accent"}`} />
-              <div className="flex-1">
-                <h3 className="font-poppins font-medium text-sm text-foreground">{e.matiere}</h3>
-                <p className="font-inter text-xs text-muted-foreground">{jours[e.jour]} · {e.heureDebut}h-{e.heureFin}h · {e.salle} · {e.enseignant}</p>
-              </div>
-              <span className={`px-2 py-0.5 rounded text-[11px] font-inter font-medium ${typeColors[e.type]}`}>{e.type}</span>
-            </div>
-          ))}
+        <div className="space-y-1">
+          <h4 className="font-poppins font-semibold text-sm text-foreground">Information d'affichage</h4>
+          <p className="font-inter text-xs text-muted-foreground leading-relaxed">
+            L'affichage interactif a été remplacé par le document PDF officiel pour garantir l'exactitude des informations
+            transmises par l'IFRI. Vous pouvez visualiser le tableau directement ici ou le télécharger pour une consultation hors ligne.
+          </p>
         </div>
-      )}
-
-      {view === "mois" && (
-        <div className="bg-background rounded-xl border border-border p-8 shadow-sm text-center">
-          <p className="font-inter text-sm text-muted-foreground">Vue mensuelle — Fonctionnalité à venir</p>
-        </div>
-      )}
+      </div>
     </div>
   );
 };

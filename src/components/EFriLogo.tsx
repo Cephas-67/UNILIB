@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import logoifri from "@/assets/logoifri.png";
 
 const EFriLogo = ({ size = "md", white = false }: { size?: "sm" | "md" | "lg"; white?: boolean }) => {
@@ -8,13 +9,13 @@ const EFriLogo = ({ size = "md", white = false }: { size?: "sm" | "md" | "lg"; w
   };
   const s = sizes[size];
   return (
-    <div className="flex items-center gap-2">
+    <Link to="/e-fri" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
       <img src={logoifri} alt="Logo IFRI" className={`${s.img} object-contain`} />
       <span className={`font-poppins ${s.text}`}>
         <span className={`font-medium ${white ? "text-white/80" : "text-muted-foreground"}`}>e-</span>
         <span className={`font-bold ${white ? "text-white" : "text-foreground"}`}>FRI</span>
       </span>
-    </div>
+    </Link>
   );
 };
 

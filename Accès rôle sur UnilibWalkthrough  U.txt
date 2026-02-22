@@ -1,0 +1,34 @@
+Accès rôle sur UnilibWalkthrough : UniLib v2.1 - Système Multi-Rôles et Admin Serveur
+Cette mise à jour introduit une gestion avancée des permissions et déporte l'administration vers l'interface serveur Django.
+
+1. Système à Trois Rôles
+Les utilisateurs sont désormais classés en trois catégories avec des permissions distinctes :
+
+Étudiant : Consultation des ressources et cours pratiques. Pas de droit de téléversement ni d'accès à l'administration.
+Responsable : Peut téléverser des ressources académiques (Cours, TD, TP), mais n'a pas accès à la création de cours pratiques ni à l'administration technique.
+Administrateur : Accès total. Peut tout téléverser, créer des cours pratiques et accéder au panneau d'administration serveur.
+2. Administration Côté Serveur (Django)
+Lien Direct : L'onglet "Administration" de la barre latérale redirige désormais vers l'interface d'administration Django (http://localhost:8000/admin).
+Ouverture Sécurisée : Le lien s'ouvre dans un nouvel onglet pour préserver la session utilisateur sur le portail.
+3. Contrôle d'Accès Visuel et Préventif
+Navigation Dynamique : Les liens "Téléverser" et "Administration" n'apparaissent que si l'utilisateur possède le rôle requis.
+Restriction de Contenu : Le bouton "Ajouter un cours" dans la section Cours Pratiques est strictement réservé aux administrateurs.
+Page de Restriction : Les étudiants tentant d'accéder au formulaire de contribution via l'URL sont accueillis par un message d'accès restreint.
+4. Comptes de Test
+Vous pouvez tester les différents rôles avec les comptes suivants :
+
+Étudiant : marcel.ahouandjinou@ifri.uac.bj (pass: password123)
+Responsable : responsable@ifri.uac.bj (pass: password123)
+Admin : admin@ifri.uac.bj (pass: admin)
+Vérification technique
+ Mise à jour du hook 
+useSession
+ pour supporter les nouveaux rôles.
+ Filtrage dynamique des composants 
+DashboardLayout
+, 
+EFriProjects
+ et 
+EFriContribute
+.
+ Redirection externe pour

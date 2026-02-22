@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import UniLibLogo from "@/components/UniLibLogo";
 import { Mail, Lock, Eye, EyeOff, User } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -21,7 +22,7 @@ const getPasswordStrength = (pw: string) => {
 const EFriSignup = () => {
   const [form, setForm] = useState({
     nom: "", prenom: "", email: "", filiere: "", promotion: "", semestre: "",
-    password: "", confirmPassword: "", cgu: false,
+    password: "", confirmPassword: "", cgu: false, role: "etudiant" as "etudiant" | "responsable", verificationCode: ""
   });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -36,13 +37,21 @@ const EFriSignup = () => {
     if (!form.nom.trim()) errs.nom = "Requis";
     if (!form.prenom.trim()) errs.prenom = "Requis";
     if (!form.email) errs.email = "Requis";
-    else if (!form.email.endsWith("@ifri.uac.bj")) errs.email = "Doit se terminer par @ifri.uac.bj";
     if (!form.filiere) errs.filiere = "Requis";
     if (!form.promotion) errs.promotion = "Requis";
     if (!form.semestre) errs.semestre = "Requis";
     if (!form.password) errs.password = "Requis";
     else if (form.password.length < 8) errs.password = "Minimum 8 caractères";
     if (form.password !== form.confirmPassword) errs.confirmPassword = "Les mots de passe ne correspondent pas";
+    if (form.role === "responsable") {
+      if (!form.verificationCode) {
+        errs.verificationCode = "Un code de vérification est requis";
+      } else {
+        const storedCodes = JSON.parse(localStorage.getItem("unilib_resp_codes") || "[]");
+        const validCode = storedCodes.find((c: any) => c.code === form.verificationCode.toUpperCase() && !c.used);
+        if (!validCode) errs.verificationCode = "Code invalide ou déjà utilisé";
+      }
+    }
     if (!form.cgu) errs.cgu = "Vous devez accepter les CGU";
     setErrors(errs);
     return Object.keys(errs).length === 0;
@@ -63,11 +72,21 @@ const EFriSignup = () => {
       filiere: form.filiere,
       promotion: form.promotion,
       semestre: form.semestre,
-      role: "etudiant" as const
+      role: form.role,
+      status: "active" as const
     };
 
     const existingUsers = JSON.parse(localStorage.getItem("unilib_users") || "[]");
     localStorage.setItem("unilib_users", JSON.stringify([...existingUsers, newUser]));
+
+    // Consume the code if it's a responsable
+    if (form.role === "responsable") {
+      const storedCodes = JSON.parse(localStorage.getItem("unilib_resp_codes") || "[]");
+      const updatedCodes = storedCodes.map((c: any) =>
+        c.code === form.verificationCode.toUpperCase() ? { ...c, used: true } : c
+      );
+      localStorage.setItem("unilib_resp_codes", JSON.stringify(updatedCodes));
+    }
 
     setLoading(false);
     toast({
@@ -91,7 +110,10 @@ const EFriSignup = () => {
   return (
     <div className="min-h-screen flex">
       {/* Left panel */}
-      <div className="hidden lg:flex lg:w-[40%] bg-primary items-center justify-center p-12">
+      <div className="hidden lg:flex lg:w-[40%] bg-primary items-center justify-center p-12 relative">
+        <div className="absolute top-4 left-4">
+          <UniLibLogo size="small" />
+        </div>
         <div className="text-center">
           <div className="flex items-center justify-center gap-2 mb-6">
             <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
@@ -113,6 +135,21 @@ const EFriSignup = () => {
       {/* Right panel */}
       <div className="flex-1 flex items-center justify-center p-6 lg:p-12 bg-background overflow-y-auto">
         <div className="w-full max-w-lg">
+          <div className="flex items-center justify-between mb-4 lg:hidden">
+            <UniLibLogo size="small" />
+          </div>
+          <Link to="/e-fri" className="flex items-center gap-2 mb-4 lg:hidden hover:opacity-80 transition-opacity">
+            <svg width="28" height="28" viewBox="0 0 40 40" fill="none">
+              <circle cx="16" cy="24" r="12" fill="#3D5AFE" opacity="0.85" />
+              <circle cx="24" cy="24" r="12" fill="#FF9800" opacity="0.75" />
+              <circle cx="20" cy="14" r="12" fill="#69F0AE" opacity="0.8" />
+            </svg>
+            <span className="font-poppins text-lg">
+              <span className="font-medium text-muted-foreground">e-</span>
+              <span className="font-bold text-foreground">FRI</span>
+            </span>
+          </Link>
+
           <h2 className="font-poppins font-bold text-2xl text-foreground mb-1">Créer un compte e-FRI</h2>
           <p className="font-inter text-sm text-muted-foreground mb-8">Remplissez vos informations pour commencer</p>
 
@@ -134,13 +171,47 @@ const EFriSignup = () => {
             </div>
 
             <div>
-              <label className="font-inter text-sm text-foreground mb-1.5 block">Email institutionnel</label>
+              <label className="font-inter text-sm text-foreground mb-1.5 block">Email</label>
               <div className="relative">
                 <Mail size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                <input type="email" value={form.email} onChange={(e) => update("email", e.target.value)} placeholder="votre.email@ifri.uac.bj" className={`${inputClass("email")} pl-10`} />
+                <input type="email" value={form.email} onChange={(e) => update("email", e.target.value)} placeholder="votre@email.com" className={`${inputClass("email")} pl-10`} />
               </div>
               {errors.email && <p className="font-inter text-xs text-destructive mt-1">{errors.email}</p>}
             </div>
+
+            <div>
+              <label className="font-inter text-sm text-foreground mb-1.5 block">Type de compte</label>
+              <div className="grid grid-cols-2 gap-4">
+                <button
+                  type="button"
+                  onClick={() => update("role", "etudiant")}
+                  className={`py-2.5 rounded-lg font-inter text-sm transition-all border ${form.role === "etudiant" ? "bg-secondary text-secondary-foreground border-secondary" : "bg-background text-foreground border-border hover:bg-muted"}`}
+                >
+                  Étudiant
+                </button>
+                <button
+                  type="button"
+                  onClick={() => update("role", "responsable")}
+                  className={`py-2.5 rounded-lg font-inter text-sm transition-all border ${form.role === "responsable" ? "bg-secondary text-secondary-foreground border-secondary" : "bg-background text-foreground border-border hover:bg-muted"}`}
+                >
+                  Responsable
+                </button>
+              </div>
+            </div>
+
+            {form.role === "responsable" && (
+              <div className="animate-in slide-in-from-top-2 duration-300">
+                <label className="font-inter text-sm text-foreground mb-1.5 block">Code de vérification responsable</label>
+                <input
+                  value={form.verificationCode}
+                  onChange={(e) => update("verificationCode", e.target.value)}
+                  placeholder="Ex: RESP2026"
+                  className={inputClass("verificationCode")}
+                />
+                <p className="font-inter text-[10px] text-muted-foreground mt-1">Contactez l'administration pour obtenir votre code.</p>
+                {errors.verificationCode && <p className="font-inter text-xs text-destructive mt-1">{errors.verificationCode}</p>}
+              </div>
+            )}
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>

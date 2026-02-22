@@ -1,12 +1,14 @@
 import { useState } from "react";
-import { Upload, FileText, X, Check, ChevronRight, ChevronLeft, ShieldCheck, FileUp, Info } from "lucide-react";
+import { Upload, FileText, X, Check, ChevronRight, ChevronLeft, ShieldCheck, FileUp, Info, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useSession } from "@/hooks/use-session";
 
 const filieres = ["Génie Logiciel", "Système-Réseau", "SEIoT", "Intelligence Artificielle"];
 const promotions = ["L1", "L2", "L3", "M1", "M2"];
 const typesDoc = ["Cours", "TD", "TP", "Examen", "Rattrapage", "Correction"];
 
 const EFriContribute = () => {
+  const { user } = useSession();
   const [step, setStep] = useState(1);
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -22,6 +24,28 @@ const EFriContribute = () => {
     description: ""
   });
   const { toast } = useToast();
+
+  if (user?.role === "etudiant") {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-6 text-center animate-in fade-in zoom-in duration-500">
+        <div className="w-20 h-20 rounded-full bg-destructive/10 flex items-center justify-center">
+          <AlertCircle size={40} className="text-destructive" />
+        </div>
+        <div className="space-y-2">
+          <h2 className="text-2xl font-poppins font-bold text-foreground">Accès restreint</h2>
+          <p className="text-muted-foreground max-w-md mx-auto">
+            Seuls les responsables de classe et les administrateurs ont l'autorisation de téléverser des ressources académiques.
+          </p>
+        </div>
+        <button
+          onClick={() => window.history.back()}
+          className="px-6 py-2.5 rounded-xl bg-background border border-border font-inter text-sm font-semibold hover:bg-muted transition-colors"
+        >
+          Retourner au tableau de bord
+        </button>
+      </div>
+    );
+  }
 
   const update = (key: string, value: string) => setForm(f => ({ ...f, [key]: value }));
 
@@ -39,21 +63,56 @@ const EFriContribute = () => {
   };
 
   const handleSubmit = async () => {
+    if (!file) return;
+
     setUploading(true);
-    for (let i = 0; i <= 100; i += 10) {
+    // Simulate real progress but actually prepare data
+    for (let i = 0; i <= 100; i += 20) {
       setProgress(i);
-      await new Promise(r => setTimeout(r, 150));
+      await new Promise(r => setTimeout(r, 100));
     }
-    setUploading(false);
-    toast({
-      title: "Téléchargement réussi !",
-      description: "Le document a été enregistré avec succès dans la base académique.",
-    });
-    // Reset
-    setStep(1);
-    setFile(null);
-    setProgress(0);
-    setForm({ titre: "", matiere: "", enseignant: "", type: "", filiere: "", promotion: "", semestre: "S1", description: "" });
+
+    // Convert file to Data URL for persistence in localStorage
+    const reader = new FileReader();
+    const addNotification = (title: string, description: string) => {
+      const stored = JSON.parse(localStorage.getItem("unilib_notifications") || "[]");
+      const newNotif = {
+        id: Date.now(),
+        title,
+        description,
+        time: "À l'instant",
+        type: "success"
+      };
+      localStorage.setItem("unilib_notifications", JSON.stringify([newNotif, ...stored]));
+    };
+
+    reader.onloadend = () => {
+      const fileUrl = reader.result as string;
+      const newResource = {
+        id: Date.now().toString(),
+        titre: form.titre,
+        matiere: form.matiere,
+        filiere: form.filiere,
+        promotion: form.promotion,
+        semestre: form.semestre,
+        type: form.type,
+        date: new Date().toLocaleDateString('fr-FR'),
+        format: file.name.split('.').pop()?.toUpperCase() || "PDF",
+        fileUrl: fileUrl
+      };
+
+      const existing = JSON.parse(localStorage.getItem("unilib_resources") || "[]");
+      localStorage.setItem("unilib_resources", JSON.stringify([...existing, newResource]));
+
+      addNotification("Nouvelle ressource ajoutée", `« ${newResource.titre} » est maintenant disponible en ${newResource.filiere}.`);
+
+      setUploading(false);
+      toast({ title: "Document téléversé", description: "Votre document a été ajouté avec succès." });
+      setFile(null);
+      setForm({ titre: "", matiere: "", enseignant: "", type: "", filiere: "", promotion: "", semestre: "S1", description: "" });
+      setStep(1);
+    };
+    reader.readAsDataURL(file);
   };
 
   const isFormValid = form.titre && form.matiere && form.type && form.filiere && form.promotion;

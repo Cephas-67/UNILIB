@@ -9,8 +9,9 @@ export interface User {
     promotion: string;
     semestre: string;
     avatar?: string;
-    role: "etudiant" | "admin";
+    role: "etudiant" | "responsable" | "admin";
     password?: string;
+    status?: "active" | "inactive" | "banned";
 }
 
 export const useSession = () => {

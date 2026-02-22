@@ -1,12 +1,13 @@
 import { Link } from "react-router-dom";
 import { ArrowUpRight, Database, Clock, Users, Sparkles } from "lucide-react";
 import EFriLogo from "@/components/EFriLogo";
+import UniLibLogo from "@/components/UniLibLogo";
 
 import logoifri from "@/assets/logoifri.png";
 
 const stats = [
   { value: "500+", label: "ressources" },
-  { value: "200+", label: "projets" },
+  { value: "200+", label: "cours pratiques" },
   { value: "1000+", label: "étudiants actifs" },
   { value: "50+", label: "enseignants" },
 ];
@@ -15,7 +16,7 @@ const features = [
   { icon: Database, color: "#2196F3", title: "Centralisation", description: "Tous vos cours, TDs, TPs et examens accessibles depuis un seul endroit." },
   { icon: Clock, color: "#4CAF50", title: "Gain de temps", description: "Trouvez rapidement ce dont vous avez besoin avec notre système de filtres avancés." },
   { icon: Users, color: "#FF9800", title: "Collaboration", description: "Partagez vos ressources et contribuez à enrichir la bibliothèque commune." },
-  { icon: Sparkles, color: "#2196F3", title: "IA Intégrée", description: "Un assistant intelligent pour vous aider dans vos révisions et projets." },
+  { icon: Sparkles, color: "#2196F3", title: "IA Intégrée", description: "Un assistant intelligent pour vous aider dans vos révisions et cours pratiques." },
 ];
 
 import studentHero from "@/assets/student-efri.png";
@@ -28,19 +29,29 @@ const DotGrid = ({ color }: { color: string }) => (
   </div>
 );
 
+import { useEffect } from "react";
+
 const EFriLanding = () => {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   return (
     <div className="min-h-screen flex flex-col">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-background shadow-sm">
         <div className="container mx-auto flex h-16 items-center justify-between px-6 lg:px-12">
-          <Link to="/e-fri">
-            <EFriLogo />
-          </Link>
+          <div className="flex items-center gap-4">
+            <UniLibLogo size="small" />
+            <div className="w-px h-5 bg-border" />
+            <Link to="/e-fri">
+              <EFriLogo />
+            </Link>
+          </div>
           <nav className="hidden md:flex items-center gap-8">
             <Link to="/e-fri" className="font-inter text-sm font-medium text-foreground">Accueil</Link>
             <Link to="/e-fri/ressources" className="font-inter text-sm text-muted-foreground hover:text-foreground transition-colors">Ressources</Link>
-            <Link to="/e-fri/projets" className="font-inter text-sm text-muted-foreground hover:text-foreground transition-colors">Projets</Link>
+            <Link to="/e-fri/cours-pratiques" className="font-inter text-sm text-muted-foreground hover:text-foreground transition-colors">Cours Pratiques</Link>
             <Link to="/e-fri/emploi-du-temps" className="font-inter text-sm text-muted-foreground hover:text-foreground transition-colors">Emploi du Temps</Link>
             <Link to="/e-fri/ia" className="font-inter text-sm text-muted-foreground hover:text-foreground transition-colors">IA Assistant</Link>
           </nav>

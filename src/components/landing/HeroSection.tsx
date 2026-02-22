@@ -31,7 +31,7 @@ const HeroSection = () => {
               Accédez facilement aux épreuves, consultez les sujets des années précédentes et préparez vos examens avec des ressources fiables et organisées
             </p>
 
-            <div className="flex flex-wrap gap-4">
+            <div className="flex flex-wrap gap-4 justify-center lg:justify-start">
               <a
                 href="#ecoles"
                 className="inline-flex items-center gap-2 rounded-lg bg-accent px-6 py-3 font-inter text-sm font-medium text-accent-foreground hover:bg-accent-hover transition-colors"
@@ -56,65 +56,61 @@ const HeroSection = () => {
             </div>
           </div>
 
-          {/* Right column - Photo + Decorative shapes (Refined with Blue, Orange, Green) */}
-          <div className="flex-1 relative h-[500px] lg:h-[550px] w-full max-w-[550px] flex items-center justify-center">
-            {/* 1. Blue Card (Main background) - Frames the student */}
+          {/* Right column - Photo + Decorative shapes */}
+          <div className="flex-1 relative h-[400px] lg:h-[530px] w-full max-w-[550px] flex items-center justify-center">
+            {/* 1. Blue Card (Main background) */}
             <div
-              className="absolute rounded-[40px] shadow-lg animate-in fade-in zoom-in duration-700"
+              className="absolute rounded-[40px] shadow-lg animate-in fade-in zoom-in duration-700 lg:w-[350px] lg:h-[350px] lg:top-[60px] lg:right-[120px]"
               style={{
-                backgroundColor: "hsl(var(--secondary))", // Blue
-                width: "320px",
-                height: "380px",
-                top: "120px",
-                right: "30px",
-                transform: "rotate(10deg)",
+                backgroundColor: "hsl(var(--secondary))",
+                width: "280px",
+                height: "280px",
+                top: "40px",
+                right: "60px",
+                transform: "rotate(45deg)",
                 zIndex: 1,
               }}
             />
 
-            {/* 2. Orange Circle (Bottom left overlap) - Floating */}
+            {/* 2. Orange Circle */}
             <div
               className="absolute rounded-full shadow-md animate-hero-float-orange"
               style={{
-                backgroundColor: "rgba(255, 152, 0, 0.25)", // Translucent Orange
+                backgroundColor: "rgba(255, 152, 0, 0.25)",
                 border: "2px solid hsl(var(--accent))",
-                width: "200px",
-                height: "200px",
-                bottom: "20px",
-                left: "10px",
+                width: "40px",
+                height: "80px",
+                bottom: "10px",
+                left: "30px",
                 zIndex: 4,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center"
               }}
             >
-              {/* Smiley icon inside orange circle */}
-              <div className="w-8 h-8 rounded-full border-2 border-[hsl(var(--accent))] flex items-center justify-center">
-                <div className="w-1.5 h-1.5 rounded-full bg-[hsl(var(--accent))] mr-1" />
-                <div className="w-1.5 h-1.5 rounded-full bg-[hsl(var(--accent))]" />
+              <div className="w-5 h-5 rounded-full border border-[hsl(var(--accent))] flex items-center justify-center">
+                <div className="w-1 h-1 rounded-full bg-[hsl(var(--accent))] mr-1" />
+                <div className="w-1 h-1 rounded-full bg-[hsl(var(--accent))]" />
               </div>
             </div>
 
             {/* 3. Green Circle (Top left overlay) - Floating */}
             <div
-              className="absolute rounded-full shadow-sm animate-hero-float-green"
+              className="absolute rounded-full shadow-sm animate-hero-float-green w-[40px] h-[40px] lg:w-[70px] lg:h-[70px]"
               style={{
-                backgroundColor: "hsl(var(--primary))", // Green
-                width: "70px",
-                height: "70px",
+                backgroundColor: "rgba(1, 171, 7, 0.78)", // Green
                 top: "120px",
                 left: "50px",
-                zIndex: 0,
+                zIndex: 1,
+
               }}
             />
 
             {/* 4. Small Blue Circle (Accent right) - Floating */}
             <div
-              className="absolute rounded-full shadow-sm animate-hero-float-blue"
+              className="absolute rounded-full shadow-sm animate-hero-float-blue w-[20px] h-[20px] lg:w-[35px] lg:h-[35px]"
               style={{
-                backgroundColor: "hsl(var(--secondary))", // Blue
-                width: "40px",
-                height: "40px",
+                backgroundColor: "hsl(var(--secondary))",
                 bottom: "150px",
                 right: "0px",
                 zIndex: 0,
@@ -122,15 +118,15 @@ const HeroSection = () => {
             />
 
             {/* 5. Decorative wavy lines (SVG) - Orange */}
-            <div className="absolute top-[100px] left-[30px] z-10 opacity-70">
+            <div className="absolute top-[100px] left-[20px] z-10 opacity-50 lg:top-[60px] lg:left-[40px]">
               <svg width="60" height="30" viewBox="0 0 60 30" fill="none">
-                <path d="M5 25C15 10 25 10 35 25C45 40 55 40 65 25" stroke="hsl(var(--accent))" strokeWidth="3" strokeLinecap="round" />
+                <path d="M5 25C15 10 25 10 35 25C45 40 55 40 65 25" stroke="hsl(var(--accent))" strokeWidth="4" strokeLinecap="round" />
               </svg>
             </div>
 
-            {/* 6. Main Student Image - Floating and animated */}
-            <div className="absolute inset-x-0 bottom-0 flex justify-center items-end z-[3]">
-              <div className="relative w-[280px] h-[420px] lg:w-[320px] lg:h-[480px] animate-in fade-in slide-in-from-bottom duration-1000">
+            {/* 6. Main Student Image */}
+            <div className="absolute inset-x-0 bottom-10 lg:bottom-40 flex justify-center items-end z-[3]">
+              <div className="relative w-[180px] h-[240px] lg:w-[235px] lg:h-[360px] overflow-visible animate-in fade-in slide-in-from-bottom duration-1000">
                 <img
                   src={studentHero}
                   alt="Étudiant UniLib"

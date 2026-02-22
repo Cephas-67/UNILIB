@@ -6,8 +6,37 @@ import { useSession } from "@/hooks/use-session";
 const EFriDashboard = () => {
   const { user } = useSession();
 
+  // Reactive counts from localStorage (strictly user-added to start at zero)
+  const getResourceCount = () => {
+    const stored = JSON.parse(localStorage.getItem("unilib_resources") || "[]");
+    return stored.length;
+  };
+
+  const getRecentResourceCount = () => {
+    const stored = JSON.parse(localStorage.getItem("unilib_resources") || "[]");
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+    return stored.filter((r: any) => {
+      const parts = r.date.split('/');
+      const d = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+      return d >= sevenDaysAgo;
+    }).length;
+  };
+
+  const getCoursCount = () => {
+    const stored = JSON.parse(localStorage.getItem("unilib_cours") || "[]");
+    return stored.length;
+  };
+
+  const getDownloadCount = () => {
+    if (!user?.email) return 0;
+    const stored = localStorage.getItem(`unilib_download_count_${user.email}`) || "0";
+    return parseInt(stored);
+  };
+
   return (
-    <div className="space-y-8 pb-20 lg:pb-0">
+    <div className="space-y-6 pb-20 lg:pb-0 animate-in fade-in slide-in-from-bottom-4 duration-700">
       {/* Greeting */}
       <h1 className="font-poppins font-semibold text-2xl text-foreground text-secondary">
         Bienvenue, {user?.prenom || "Étudiant"} 👋
@@ -22,8 +51,10 @@ const EFriDashboard = () => {
             </div>
             <span className="font-inter text-sm text-muted-foreground">Dernières ressources</span>
           </div>
-          <p className="font-poppins font-bold text-2xl text-foreground">12</p>
-          <p className="font-inter text-xs text-muted-foreground mt-1">nouvelles cette semaine</p>
+          <p className="font-poppins font-bold text-2xl text-foreground">{getResourceCount()}</p>
+          <p className="font-inter text-xs text-muted-foreground mt-1">
+            {getRecentResourceCount()} nouvelles cette semaine
+          </p>
         </div>
 
         <div className="bg-background rounded-xl border border-border p-5 shadow-sm">
@@ -31,10 +62,10 @@ const EFriDashboard = () => {
             <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
               <FolderKanban size={20} className="text-primary" />
             </div>
-            <span className="font-inter text-sm text-muted-foreground">Projets de référence</span>
+            <span className="font-inter text-sm text-muted-foreground">Cours pratiques</span>
           </div>
-          <p className="font-poppins font-bold text-2xl text-foreground">{projets.length}</p>
-          <p className="font-inter text-xs text-muted-foreground mt-1">supports complets</p>
+          <p className="font-poppins font-bold text-2xl text-foreground">{getCoursCount()}</p>
+          <p className="font-inter text-xs text-muted-foreground mt-1">supports disponibles</p>
         </div>
 
         <div className="bg-background rounded-xl border border-border p-5 shadow-sm">
@@ -44,8 +75,8 @@ const EFriDashboard = () => {
             </div>
             <span className="font-inter text-sm text-muted-foreground">Prochain cours</span>
           </div>
-          <p className="font-poppins font-bold text-lg text-foreground">Algo. Avancée</p>
-          <p className="font-inter text-xs text-muted-foreground mt-1">Lundi 8h — Amphi A</p>
+          <p className="font-poppins font-bold text-lg text-foreground">Planning en attente</p>
+          <p className="font-inter text-xs text-muted-foreground mt-1">Consultez l'emploi du temps</p>
         </div>
 
         <div className="bg-background rounded-xl border border-border p-5 shadow-sm">
@@ -55,8 +86,8 @@ const EFriDashboard = () => {
             </div>
             <span className="font-inter text-sm text-muted-foreground">Téléchargements</span>
           </div>
-          <p className="font-poppins font-bold text-2xl text-foreground">47</p>
-          <p className="font-inter text-xs text-muted-foreground mt-1">ce mois-ci</p>
+          <p className="font-poppins font-bold text-2xl text-foreground">{getDownloadCount()}</p>
+          <p className="font-inter text-xs text-muted-foreground mt-1">total effectués</p>
         </div>
       </div>
 
@@ -68,8 +99,8 @@ const EFriDashboard = () => {
             <span className="font-inter text-sm font-medium">Accéder aux ressources</span>
             <ArrowRight size={18} />
           </Link>
-          <Link to="/e-fri/projets" className="flex items-center justify-between p-4 rounded-xl bg-secondary text-secondary-foreground hover:opacity-90 transition-opacity">
-            <span className="font-inter text-sm font-medium">Explorer les projets</span>
+          <Link to="/e-fri/cours-pratiques" className="flex items-center justify-between p-4 rounded-xl bg-secondary text-secondary-foreground hover:opacity-90 transition-opacity">
+            <span className="font-inter text-sm font-medium">Explorer les cours pratiques</span>
             <ArrowRight size={18} />
           </Link>
           <Link to="/e-fri/televerser" className="flex items-center justify-between p-4 rounded-xl bg-accent text-accent-foreground hover:opacity-90 transition-opacity">
