@@ -269,7 +269,7 @@ const EFriProfile = () => {
             <div className="text-center md:text-left flex-1">
               <h1 className="font-poppins font-bold text-xl text-foreground">{user.prenom} {user.nom}</h1>
               <p className="font-inter text-sm text-muted-foreground">
-                Étudiant · {user.filiere} · {user.promotion}
+                Étudiant · {user.filiere}
               </p>
               <p className="font-inter text-xs text-muted-foreground mt-1">{user.email}</p>
             </div>
@@ -290,8 +290,8 @@ const EFriProfile = () => {
                 key={t}
                 onClick={() => setActiveTab(t)}
                 className={`px-4 py-2 rounded-md font-inter text-sm font-medium whitespace-nowrap transition-all ${activeTab === t
-                    ? "bg-background text-foreground shadow-sm scale-105"
-                    : "text-muted-foreground hover:text-foreground"
+                  ? "bg-background text-foreground shadow-sm scale-105"
+                  : "text-muted-foreground hover:text-foreground"
                   }`}
               >
                 {t}
@@ -320,8 +320,6 @@ const EFriProfile = () => {
                     { label: "Prénom", key: "prenom" },
                     { label: "Email", key: "email" },
                     { label: "Filière", key: "filiere" },
-                    { label: "Promotion", key: "promotion" },
-                    { label: "Semestre", key: "semestre" },
                   ].map(field => (
                     <div key={field.key} className="space-y-1.5">
                       <label className="font-inter text-[10px] font-bold text-muted-foreground uppercase tracking-wider">

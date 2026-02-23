@@ -41,6 +41,12 @@ const DashboardLayout = () => {
     return () => clearInterval(interval);
   }, []);
 
+  const markAsRead = (id: number) => {
+    const updated = notifications.filter(n => n.id !== id);
+    setNotifications(updated);
+    localStorage.setItem("unilib_notifications", JSON.stringify(updated));
+  };
+
   const handleLogout = () => {
     logout();
     navigate("/e-fri/connexion", { replace: true });
@@ -73,7 +79,7 @@ const DashboardLayout = () => {
               </div>
               <div>
                 <p className="font-poppins font-semibold text-sm text-foreground">{user?.prenom} {user?.nom}</p>
-                <span className="inline-block px-2 py-0.5 rounded text-[11px] font-inter bg-[#E3F2FD] text-secondary">{user?.filiere} · {user?.promotion}</span>
+                <span className="inline-block px-2 py-0.5 rounded text-[11px] font-inter bg-[#E3F2FD] text-secondary">{user?.filiere}</span>
               </div>
             </div>
           </div>
@@ -187,7 +193,7 @@ const DashboardLayout = () => {
                   <div className="max-h-[300px] overflow-y-auto">
                     {notifications.length > 0 ? (
                       notifications.map((notif: any) => (
-                        <div key={notif.id} className="p-4 border-b border-border last:border-0 hover:bg-muted/50 transition-colors cursor-pointer group">
+                        <div key={notif.id} onClick={() => markAsRead(notif.id)} className="p-4 border-b border-border last:border-0 hover:bg-muted/50 transition-colors cursor-pointer group">
                           <div className="flex gap-3">
                             <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${notif.type === 'success' ? 'bg-primary/10 text-primary' :
                               notif.type === 'warning' ? 'bg-accent/10 text-accent' : 'bg-secondary/10 text-secondary'
@@ -209,7 +215,6 @@ const DashboardLayout = () => {
                       </div>
                     )}
                   </div>
-                  <Link to="#" className="block p-3 text-center border-t border-border font-inter text-[10px] font-bold text-muted-foreground hover:text-secondary transition-colors">VOIR TOUTES LES NOTIFICATIONS</Link>
                 </PopoverContent>
               </Popover>
 

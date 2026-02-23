@@ -16,7 +16,7 @@ const HeroSection = () => {
       <div className="container mx-auto px-6 lg:px-12">
         <div className="flex flex-col lg:flex-row items-center gap-12">
           {/* Grille de points bleus — haut gauche de la page */}
-          <div className="absolute top-20 left-8 lg:left-12" style={{ zIndex: 5 }}>
+          <div className="hidden lg:block absolute top-20 left-8 lg:left-12" style={{ zIndex: 5 }}>
             <DotGrid color="hsl(var(--secondary))" />
           </div>
 
@@ -60,7 +60,7 @@ const HeroSection = () => {
           <div className="flex-1 relative h-[400px] lg:h-[530px] w-full max-w-[550px] flex items-center justify-center">
             {/* 1. Blue Card (Main background) */}
             <div
-              className="absolute rounded-[40px] shadow-lg animate-in fade-in zoom-in duration-700 lg:w-[350px] lg:h-[350px] lg:top-[60px] lg:right-[120px]"
+              className="hidden lg:block absolute rounded-[40px] shadow-lg animate-in fade-in zoom-in duration-700 lg:w-[420px] lg:h-[420px] lg:top-[40px] lg:right-[80px]"
               style={{
                 backgroundColor: "hsl(var(--secondary))",
                 width: "280px",
@@ -74,7 +74,7 @@ const HeroSection = () => {
 
             {/* 2. Orange Circle */}
             <div
-              className="absolute rounded-full shadow-md animate-hero-float-orange"
+              className="hidden lg:block absolute rounded-full shadow-md animate-hero-float-orange"
               style={{
                 backgroundColor: "rgba(255, 152, 0, 0.25)",
                 border: "2px solid hsl(var(--accent))",
@@ -96,7 +96,7 @@ const HeroSection = () => {
 
             {/* 3. Green Circle (Top left overlay) - Floating */}
             <div
-              className="absolute rounded-full shadow-sm animate-hero-float-green w-[40px] h-[40px] lg:w-[70px] lg:h-[70px]"
+              className="hidden lg:block absolute rounded-full shadow-sm animate-hero-float-green w-[40px] h-[40px] lg:w-[70px] lg:h-[70px]"
               style={{
                 backgroundColor: "rgba(1, 171, 7, 0.78)", // Green
                 top: "120px",
@@ -108,7 +108,7 @@ const HeroSection = () => {
 
             {/* 4. Small Blue Circle (Accent right) - Floating */}
             <div
-              className="absolute rounded-full shadow-sm animate-hero-float-blue w-[20px] h-[20px] lg:w-[35px] lg:h-[35px]"
+              className="hidden lg:block absolute rounded-full shadow-sm animate-hero-float-blue w-[20px] h-[20px] lg:w-[35px] lg:h-[35px]"
               style={{
                 backgroundColor: "hsl(var(--secondary))",
                 bottom: "150px",
@@ -117,34 +117,35 @@ const HeroSection = () => {
               }}
             />
 
-            {/* 5. Decorative wavy lines (SVG) - Orange */}
-            <div className="absolute top-[100px] left-[20px] z-10 opacity-50 lg:top-[60px] lg:left-[40px]">
-              <svg width="60" height="30" viewBox="0 0 60 30" fill="none">
-                <path d="M5 25C15 10 25 10 35 25C45 40 55 40 65 25" stroke="hsl(var(--accent))" strokeWidth="4" strokeLinecap="round" />
-              </svg>
-            </div>
 
             {/* 6. Main Student Image */}
-            <div className="absolute inset-x-0 bottom-10 lg:bottom-40 flex justify-center items-end z-[3]">
-              <div className="relative w-[180px] h-[240px] lg:w-[235px] lg:h-[360px] overflow-visible animate-in fade-in slide-in-from-bottom duration-1000">
+            <div className="hidden lg:block absolute inset-x-0 bottom-10 lg:bottom-20 flex justify-center items-end z-[3]">
+              <div className="relative w-[180px] h-[240px] lg:w-[220px] lg:h-[400px] left-[250px] bottom-[30px] overflow-visible animate-in fade-in slide-in-from-bottom duration-1000">
+
                 <img
                   src={studentHero}
-                  alt="Étudiant UniLib"
-                  className="w-full h-full object-contain drop-shadow-2xl animate-hero-float"
-                  loading="lazy"
+                  alt="Étudiant IFRI"
+                  className="w-full h-full object-contain"
+                  style={{
+                    objectPosition: "center top",
+
+                    filter: "drop-shadow(0 0px 0px rgba(0,0,0,0.15))",
+                    maskImage: "linear-gradient(to bottom, black 89%, transparent 85%)",
+                    WebkitMaskImage: "linear-gradient(to bottom, white 80%, transparent 89%)",
+                  }}
                 />
               </div>
             </div>
 
             {/* 7. Floating "Smiley" bubbles - Orange and Blue */}
-            <div className="absolute top-[60px] right-[20px] z-10 bg-white/90 p-2 rounded-full shadow-lg border border-gray-100 animate-hero-float-blue">
+            <div className="hidden lg:block absolute top-[60px] right-[20px] z-10 bg-white/90 p-2 rounded-full shadow-lg border border-gray-100 animate-hero-float-blue">
               <div className="w-5 h-5 rounded-full border-2 border-[hsl(var(--secondary))] flex items-center justify-center">
                 <div className="w-1.5 h-1.5 rounded-full bg-[hsl(var(--secondary))] mr-0.5" />
                 <div className="w-1.5 h-1.5 rounded-full bg-[hsl(var(--secondary))]" />
               </div>
             </div>
 
-            <div className="absolute bottom-[200px] left-[20%] z-10 bg-white/90 p-2 rounded-full shadow-lg border border-gray-100 animate-hero-float-orange">
+            <div className="hidden lg:block absolute bottom-[200px] left-[20%] z-10 bg-white/90 p-2 rounded-full shadow-lg border border-gray-100 animate-hero-float-orange">
               <div className="w-5 h-5 rounded-full border-2 border-[hsl(var(--accent))] flex items-center justify-center">
                 <div className="w-1.5 h-1.5 rounded-full bg-[hsl(var(--accent))] mr-0.5" />
                 <div className="w-1.5 h-1.5 rounded-full bg-[hsl(var(--accent))]" />

@@ -4,9 +4,7 @@ import UniLibLogo from "@/components/UniLibLogo";
 import { Mail, Lock, Eye, EyeOff, User } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
-const filieres = ["Génie Logiciel", "Système-Réseau", "SEIoT", "Intelligence Artificielle"];
-const promotions = ["L1", "L2", "L3", "M1", "M2"];
-const semestres = ["S1", "S2"];
+const filieres = ["Genie Logiciel", "Intelligence Artificielle", "Securite Informatique", "SEiot", "Internet Multimedia"];
 
 const getPasswordStrength = (pw: string) => {
   let score = 0;
@@ -21,7 +19,7 @@ const getPasswordStrength = (pw: string) => {
 
 const EFriSignup = () => {
   const [form, setForm] = useState({
-    nom: "", prenom: "", email: "", filiere: "", promotion: "", semestre: "",
+    nom: "", prenom: "", email: "", filiere: "",
     password: "", confirmPassword: "", cgu: false, role: "etudiant" as "etudiant" | "responsable", verificationCode: ""
   });
   const [showPassword, setShowPassword] = useState(false);
@@ -38,8 +36,6 @@ const EFriSignup = () => {
     if (!form.prenom.trim()) errs.prenom = "Requis";
     if (!form.email) errs.email = "Requis";
     if (!form.filiere) errs.filiere = "Requis";
-    if (!form.promotion) errs.promotion = "Requis";
-    if (!form.semestre) errs.semestre = "Requis";
     if (!form.password) errs.password = "Requis";
     else if (form.password.length < 8) errs.password = "Minimum 8 caractères";
     if (form.password !== form.confirmPassword) errs.confirmPassword = "Les mots de passe ne correspondent pas";
@@ -70,8 +66,6 @@ const EFriSignup = () => {
       nom: form.nom,
       prenom: form.prenom,
       filiere: form.filiere,
-      promotion: form.promotion,
-      semestre: form.semestre,
       role: form.role,
       status: "active" as const
     };
@@ -97,7 +91,7 @@ const EFriSignup = () => {
   };
 
   const strength = getPasswordStrength(form.password);
-  const isFormValid = form.nom && form.prenom && form.email && form.filiere && form.promotion && form.semestre && form.password && form.confirmPassword && form.cgu;
+  const isFormValid = form.nom && form.prenom && form.email && form.filiere && form.password && form.confirmPassword && form.cgu;
 
   const inputClass = (field: string) =>
     `w-full px-4 py-3 rounded-lg border font-inter text-sm text-foreground bg-background outline-none transition-colors ${errors[field] ? "border-destructive border-2" : "border-input focus:border-secondary focus:border-2"
@@ -213,7 +207,7 @@ const EFriSignup = () => {
               </div>
             )}
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 gap-4">
               <div>
                 <label className="font-inter text-sm text-foreground mb-1.5 block">Filière</label>
                 <select value={form.filiere} onChange={(e) => update("filiere", e.target.value)} className={selectClass("filiere")}>
@@ -221,22 +215,6 @@ const EFriSignup = () => {
                   {filieres.map((f) => <option key={f} value={f}>{f}</option>)}
                 </select>
                 {errors.filiere && <p className="font-inter text-xs text-destructive mt-1">{errors.filiere}</p>}
-              </div>
-              <div>
-                <label className="font-inter text-sm text-foreground mb-1.5 block">Promotion</label>
-                <select value={form.promotion} onChange={(e) => update("promotion", e.target.value)} className={selectClass("promotion")}>
-                  <option value="">Choisir</option>
-                  {promotions.map((p) => <option key={p} value={p}>{p}</option>)}
-                </select>
-                {errors.promotion && <p className="font-inter text-xs text-destructive mt-1">{errors.promotion}</p>}
-              </div>
-              <div>
-                <label className="font-inter text-sm text-foreground mb-1.5 block">Semestre</label>
-                <select value={form.semestre} onChange={(e) => update("semestre", e.target.value)} className={selectClass("semestre")}>
-                  <option value="">Choisir</option>
-                  {semestres.map((s) => <option key={s} value={s}>{s}</option>)}
-                </select>
-                {errors.semestre && <p className="font-inter text-xs text-destructive mt-1">{errors.semestre}</p>}
               </div>
             </div>
 

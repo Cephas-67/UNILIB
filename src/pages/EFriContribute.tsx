@@ -3,7 +3,7 @@ import { Upload, FileText, X, Check, ChevronRight, ChevronLeft, ShieldCheck, Fil
 import { useToast } from "@/hooks/use-toast";
 import { useSession } from "@/hooks/use-session";
 
-const filieres = ["Génie Logiciel", "Système-Réseau", "SEIoT", "Intelligence Artificielle"];
+const filieres = ["Toutes", "Genie Logiciel", "Intelligence Artificielle", "Securite Informatique", "SEiot", "Internet Multimedia"];
 const promotions = ["L1", "L2", "L3", "M1", "M2"];
 const typesDoc = ["Cours", "TD", "TP", "Examen", "Rattrapage", "Correction"];
 

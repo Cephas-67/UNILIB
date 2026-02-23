@@ -15,7 +15,7 @@ const typeColors: Record<string, string> = {
 
 const formatIcons: Record<string, string> = { PDF: "#F44336", DOCX: "#2196F3", ZIP: "#FF9800" };
 
-const filieres = ["Tous", "Génie Logiciel", "Système-Réseau", "SEIoT", "Intelligence Artificielle"];
+const filieres = ["Tous", "Genie Logiciel", "Intelligence Artificielle", "Securite Informatique", "SEiot", "Internet Multimedia"];
 const promotions = ["Tous", "L1", "L2", "L3", "M1", "M2"];
 const semestres = ["Tous", "S1", "S2"];
 const types = ["Tous", "Cours", "TD", "TP", "Examen", "Rattrapage", "Correction"];

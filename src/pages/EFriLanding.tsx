@@ -72,7 +72,7 @@ const EFriLanding = () => {
           <div className="container mx-auto px-6 lg:px-12">
             <div className="flex flex-col lg:flex-row items-center gap-12">
               {/* Grille de points bleus — haut gauche */}
-              <div className="absolute top-20 left-8 lg:left-12 opacity-50" style={{ zIndex: 5 }}>
+              <div className="hidden lg:block absolute top-20 left-8 lg:left-12 opacity-50" style={{ zIndex: 5 }}>
                 <DotGrid color="hsl(var(--secondary))" />
               </div>
 
@@ -97,7 +97,7 @@ const EFriLanding = () => {
               <div className="flex-1 relative h-[500px] lg:h-[550px] w-full max-w-[550px] flex items-center justify-center">
                 {/* 1. Blue Card (Main background) */}
                 <div
-                  className="absolute rounded-[40px] shadow-lg animate-in fade-in zoom-in duration-1000"
+                  className="hidden lg:block absolute rounded-[40px] shadow-lg animate-in fade-in zoom-in duration-1000"
                   style={{
                     backgroundColor: "hsl(var(--secondary))",
                     width: "320px",
@@ -111,7 +111,7 @@ const EFriLanding = () => {
 
                 {/* 2. Orange Circle (Overlap) */}
                 <div
-                  className="absolute rounded-full shadow-md animate-hero-float-orange"
+                  className="hidden lg:block absolute rounded-full shadow-md animate-hero-float-orange"
                   style={{
                     backgroundColor: "rgba(255, 152, 0, 0.25)",
                     border: "2px solid hsl(var(--accent))",
@@ -125,7 +125,7 @@ const EFriLanding = () => {
 
                 {/* 3. Green Circle */}
                 <div
-                  className="absolute rounded-full shadow-sm animate-hero-float-green"
+                  className="hidden lg:block absolute rounded-full shadow-sm animate-hero-float-green"
                   style={{
                     backgroundColor: "hsl(var(--primary))",
                     width: "70px",
@@ -138,7 +138,7 @@ const EFriLanding = () => {
 
                 {/* 4. Small Blue Circle */}
                 <div
-                  className="absolute rounded-full shadow-sm animate-hero-float-blue"
+                  className="hidden lg:block absolute rounded-full shadow-sm animate-hero-float-blue"
                   style={{
                     backgroundColor: "hsl(var(--secondary))",
                     width: "40px",
@@ -150,7 +150,7 @@ const EFriLanding = () => {
                 />
 
                 {/* 5. Decorative wavy lines */}
-                <div className="absolute top-[100px] left-[30px] z-10 opacity-70">
+                <div className="hidden lg:block absolute top-[100px] left-[30px] z-10 opacity-70">
                   <svg width="60" height="30" viewBox="0 0 60 30" fill="none">
                     <path d="M5 25C15 10 25 10 35 25C45 40 55 40 65 25" stroke="hsl(var(--accent))" strokeWidth="3" strokeLinecap="round" />
                   </svg>
@@ -158,7 +158,7 @@ const EFriLanding = () => {
 
                 {/* 6. Student Photo Container */}
                 <div
-                  className="absolute"
+                  className="hidden lg:block absolute"
                   style={{
                     width: "320px",
                     height: "480px",
@@ -175,14 +175,14 @@ const EFriLanding = () => {
                     style={{
                       objectPosition: "center top",
                       filter: "drop-shadow(0 20px 30px rgba(0,0,0,0.15))",
-                      maskImage: "linear-gradient(to bottom, black 90%, transparent 100%)",
-                      WebkitMaskImage: "linear-gradient(to bottom, black 90%, transparent 100%)",
+                      maskImage: "linear-gradient(to bottom, black 85%, transparent 90%)",
+                      WebkitMaskImage: "linear-gradient(to bottom, black 85%, transparent 90%)",
                     }}
                   />
                 </div>
 
                 {/* 7. Floating "Smiley" bubbles */}
-                <div className="absolute top-[60px] right-[20px] z-10 bg-white/90 p-2 rounded-full shadow-lg border border-gray-100 animate-hero-float-blue">
+                <div className="hidden lg:block absolute top-[60px] right-[20px] z-10 bg-white/90 p-2 rounded-full shadow-lg border border-gray-100 animate-hero-float-blue">
                   <div className="w-5 h-5 rounded-full border-2 border-[hsl(var(--secondary))] flex items-center justify-center">
                     <div className="w-1.5 h-1.5 rounded-full bg-[hsl(var(--secondary))] mr-0.5" />
                     <div className="w-1.5 h-1.5 rounded-full bg-[hsl(var(--secondary))]" />

@@ -3,7 +3,7 @@ export const currentUser = {
   nom: "AHOUANDJINOU",
   prenom: "Marcel",
   email: "marcel.ahouandjinou@ifri.uac.bj",
-  filiere: "Génie Logiciel",
+  filiere: "Genie Logiciel",
   promotion: "L3",
   semestre: "S2",
   avatar: "",
@@ -18,7 +18,7 @@ export const registeredUsers = [
     nom: "AHOUANDJINOU",
     prenom: "Marcel",
     role: "etudiant" as const,
-    filiere: "Génie Logiciel",
+    filiere: "Genie Logiciel",
     promotion: "L3",
     semestre: "S2",
     status: "active" as const,
@@ -29,7 +29,7 @@ export const registeredUsers = [
     nom: "RESPONSABLE",
     prenom: "Marie",
     role: "responsable" as const,
-    filiere: "Génie Logiciel",
+    filiere: "Genie Logiciel",
     promotion: "L3",
     semestre: "S2",
     status: "active" as const,
@@ -68,9 +68,9 @@ export const adminStats = {
 };
 
 export const contributionsEnAttente = [
-  { id: "1", titre: "Cours - Compilation", contributeur: "Jean ADJOVI", date: "2026-02-14", type: "Cours", filiere: "Génie Logiciel" },
-  { id: "2", titre: "TD - Cryptographie", contributeur: "Marie DOSSOU", date: "2026-02-13", type: "TD", filiere: "Système-Réseau" },
+  { id: "1", titre: "Cours - Compilation", contributeur: "Jean ADJOVI", date: "2026-02-14", type: "Cours", filiere: "Genie Logiciel" },
+  { id: "2", titre: "TD - Cryptographie", contributeur: "Marie DOSSOU", date: "2026-02-13", type: "TD", filiere: "Securite Informatique" },
   { id: "3", titre: "Examen - Statistiques", contributeur: "Paul AGBANGLA", date: "2026-02-12", type: "Examen", filiere: "Intelligence Artificielle" },
-  { id: "4", titre: "TP - Développement Web", contributeur: "Aïcha SANNI", date: "2026-02-11", type: "TP", filiere: "Génie Logiciel" },
+  { id: "4", titre: "TP - Développement Web", contributeur: "Aïcha SANNI", date: "2026-02-11", type: "TP", filiere: "Genie Logiciel" },
   { id: "5", titre: "Correction - Algèbre", contributeur: "Koffi MENSAH", date: "2026-02-10", type: "Correction", filiere: "SEIoT" },
 ];
