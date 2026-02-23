@@ -25,8 +25,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'corsheaders',
-    'cloudinary_storage',
-    'cloudinary',
+    #'cloudinary_storage',
+    #'cloudinary',
     'authentication',
     'resources',
 ]
