@@ -1,4 +1,4 @@
-# 📚 UNILIB — Bibliothèque Académique e-FRI
+# 📚 UNILIB — Bibliothèque Académique e-FRI(MVP Version 1.0)
 
 Plateforme centralisée de ressources académiques pour les étudiants et enseignants de l'IFRI (Institut de Formation et de Recherche en Informatique — UAC).
 
@@ -26,9 +26,7 @@ Plateforme centralisée de ressources académiques pour les étudiants et enseig
 - de dialoguer avec un assistant IA intégré ;
 - de gérer les utilisateurs et les codes d'accès (espace admin).
 
-**Mode actuel :** La plateforme fonctionne en **mode hors-ligne / démo** — toutes les données sont stockées dans le `localStorage` du navigateur. Aucune base de données distante n'est requise pour tester.
-
-**Lien en déployement** : [https://unilib-win5.vercel.app/e-fri]
+**Mode actuel :** La plateforme fonctionne en **en ligne** : [https://unilib-win5.vercel.app/e-fri]
 
 ## Stack Technique
 
@@ -41,8 +39,11 @@ Plateforme centralisée de ressources académiques pour les étudiants et enseig
 | Style           | Tailwind CSS 3           |
 | State / Session | `localStorage` + hooks   |
 | Formulaires     | React Hook Form + Zod    |
+| Backend         | Django Rest Framework    |
+| Formulaires     | React Hook Form + Zod    |
 | Requêtes        | TanStack Query           |
 | Tests           | Vitest + Testing Library |
+
 
 ## Installation & Démarrage
 
