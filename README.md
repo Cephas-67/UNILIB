@@ -28,6 +28,8 @@ Plateforme centralisée de ressources académiques pour les étudiants et enseig
 
 **Mode actuel :** La plateforme fonctionne en **mode hors-ligne / démo** — toutes les données sont stockées dans le `localStorage` du navigateur. Aucune base de données distante n'est requise pour tester.
 
+**Lien en déployement** : [https://unilib-win5.vercel.app/e-fri]
+
 ## Stack Technique
 
 | Couche          | Technologie              |
@@ -109,7 +111,7 @@ UNILIB/
 ├── package.json
 ├── tailwind.config.ts
 ├── vite.config.ts
-└── USER_ROLES.md # Ce fichier
+└── README.md # Ce fichier
 
 ## Fonctionnalités
 
@@ -119,7 +121,7 @@ UNILIB/
 | 📂 **Ressources**      | Téléchargement, filtrage par filière et type, favoris         |
 | 🗂 **Cours Pratiques** | Projets pratiques avec suivi de progression                   |
 | 📅 **Emploi du Temps** | Calendrier hebdomadaire interactif                            |
-| 🤖 **IA Assistant**    | Chat IA pour aide aux révisions                               |
+| 🤖 **IA Assistant**    | Chat IA pour aide aux révisions (pas encore fonctionnel)                              |
 | ⬆️ **Téléversement**   | Soumission de nouvelles ressources (responsable/admin)        |
 | 👤 **Profil**          | Gestion des informations, statistiques, préférences, sécurité |
 | 🔔 **Notifications**   | Suivi en temps réel, marquage lu au clic                      |
