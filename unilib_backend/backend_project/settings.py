@@ -1,12 +1,10 @@
 from pathlib import Path
 import os
 import dj_database_url
+from decouple import config, Csv
 from datetime import timedelta
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-
-# DETECT ENVIRONMENT
-IS_PRODUCTION = os.environ.get('DATABASE_URL') is not None
 
 # SECURITY
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-86b)3&-!l6qznivfq1ja%#y2aru2=+%)@unv#1&a$#r70cjs5@')
@@ -28,18 +26,15 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'corsheaders',
+    'cloudinary_storage',
+    'cloudinary',
     'authentication',
     'resources',
 ]
 
-# Ajouter Cloudinary seulement en production
-if IS_PRODUCTION and os.environ.get('CLOUDINARY_CLOUD_NAME'):
-    INSTALLED_APPS.insert(INSTALLED_APPS.index('django.contrib.staticfiles'), 'cloudinary_storage')
-    INSTALLED_APPS.insert(INSTALLED_APPS.index('django.contrib.staticfiles'), 'cloudinary')
-
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # ← AJOUTEZ
     'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -84,31 +79,31 @@ else:
             'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
+    
+# CLOUDINARY CONFIGURATION
+IS_PRODUCTION = config('DATABASE_URL', default=None) is not None
 
-# CLOUDINARY (uniquement en production)
-if IS_PRODUCTION and os.environ.get('CLOUDINARY_CLOUD_NAME'):
+if IS_PRODUCTION:
     CLOUDINARY_STORAGE = {
-        'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME', ''),
-        'API_KEY': os.environ.get('CLOUDINARY_API_KEY', ''),
-        'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET', ''),
+        'CLOUD_NAME': config('CLOUDINARY_CLOUD_NAME'),
+        'API_KEY': config('CLOUDINARY_API_KEY'),
+        'API_SECRET': config('CLOUDINARY_API_SECRET'),
         'SECURE': True,
     }
+    # Test Cloudinary credentials
+    if not CLOUDINARY_STORAGE['CLOUD_NAME'] or not CLOUDINARY_STORAGE['API_KEY'] or not CLOUDINARY_STORAGE['API_SECRET']:
+        raise Exception("Cloudinary credentials missing! Vérifie tes variables d'environnement sur Render.")
     DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
     MEDIA_URL = ''
-    
-    print("=" * 60)
-    print(f"🌍 IS_PRODUCTION: True")
-    print(f"📦 STORAGE: Cloudinary")
-    print("=" * 60)
 else:
     DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
     MEDIA_URL = '/media/'
     MEDIA_ROOT = BASE_DIR / 'media'
-    
-    print("=" * 60)
-    print(f"🌍 IS_PRODUCTION: False")
-    print(f"📦 STORAGE: FileSystemStorage (Local)")
-    print("=" * 60)
+
+print("=" * 60)
+print(f"🌍 IS_PRODUCTION: {IS_PRODUCTION}")
+print(f"📦 STORAGE: {DEFAULT_FILE_STORAGE}")
+print("=" * 60)
 
 # PASSWORD VALIDATION
 AUTH_PASSWORD_VALIDATORS = [
@@ -128,6 +123,9 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# MEDIA
+
 
 # CORS
 CORS_ALLOW_ALL_ORIGINS = True  # En dev
