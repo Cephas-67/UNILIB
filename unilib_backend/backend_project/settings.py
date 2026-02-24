@@ -1,6 +1,7 @@
 from pathlib import Path
 import os
 import dj_database_url
+from decouple import config, Csv
 from datetime import timedelta
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,8 +26,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'corsheaders',
-    #'cloudinary_storage',
-    #'cloudinary',
+    'cloudinary_storage',
+    'cloudinary',
     'authentication',
     'resources',
 ]
@@ -78,6 +79,28 @@ else:
             'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
+    
+# CLOUDINARY CONFIGURATION
+IS_PRODUCTION = config('DATABASE_URL', default=None) is not None
+
+if IS_PRODUCTION:
+    CLOUDINARY_STORAGE = {
+        'CLOUD_NAME': config('CLOUDINARY_CLOUD_NAME'),
+        'API_KEY': config('CLOUDINARY_API_KEY'),
+        'API_SECRET': config('CLOUDINARY_API_SECRET'),
+        'SECURE': True,
+    }
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+    MEDIA_URL = ''
+else:
+    DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+    MEDIA_URL = '/media/'
+    MEDIA_ROOT = BASE_DIR / 'media'
+
+print("=" * 60)
+print(f"🌍 IS_PRODUCTION: {IS_PRODUCTION}")
+print(f"📦 STORAGE: {DEFAULT_FILE_STORAGE}")
+print("=" * 60)
 
 # PASSWORD VALIDATION
 AUTH_PASSWORD_VALIDATORS = [
@@ -99,8 +122,7 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # MEDIA
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+
 
 # CORS
 CORS_ALLOW_ALL_ORIGINS = True  # En dev
