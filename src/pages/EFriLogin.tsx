@@ -99,7 +99,7 @@ const EFriLogin = () => {
   try {
     // Utiliser un compte de test prédéfini
     const testEmail = "test@ifri.edu";
-    const testPassword = "test1234"; // Créez ce compte en base d'abord !
+    const testPassword = "test123"; // Créez ce compte en base d'abord !
     
     const data = await login(testEmail, testPassword);
     const userData = await getCurrentUser();
