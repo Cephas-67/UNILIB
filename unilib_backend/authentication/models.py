@@ -12,3 +12,18 @@ class User(AbstractUser):
 
     def __str__(self):
         return f"{self.prenom} {self.nom} ({self.email})"
+
+class ResponsableCode(models.Model):
+    code = models.CharField(max_length=20, unique=True)
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='created_codes')
+    created_at = models.DateTimeField(auto_now_add=True)
+    used = models.BooleanField(default=False)
+    used_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='used_code')
+    used_at = models.DateTimeField(null=True, blank=True)
+    
+    class Meta:
+        db_table = 'responsable_codes'
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"{self.code} ({'Utilisé' if self.used else 'Disponible'})"

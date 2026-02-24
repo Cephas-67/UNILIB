@@ -5,6 +5,7 @@ import { useSession } from "@/hooks/use-session";
 import { uploadResource } from "@/lib/api";
 
 const filieres = [
+  "Toutes",
   "Genie Logiciel", 
   "Intelligence Artificielle", 
   "Securite Informatique", 
