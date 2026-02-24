@@ -214,3 +214,17 @@ export const refreshToken = async () => {
   localStorage.setItem('access_token', data.access);
   return data;
 };
+
+export const getDashboardStats = async () => {
+  const token = localStorage.getItem('access_token');
+  
+  const response = await fetch(`${API_URL}/auth/dashboard-stats/`, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+  });
+  
+  if (!response.ok) throw new Error('Failed to fetch stats');
+  return response.json();
+};
