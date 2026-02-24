@@ -1,29 +1,44 @@
 import { BookOpen, FolderKanban, Calendar, Sparkles, TrendingUp, Clock, Download, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
-
+import { resources, projets, actualites } from "@/data/mockData";
 import { useSession } from "@/hooks/use-session";
-import { useDataFetch } from "@/hooks/useDataFetch";
-import { fetchResourceStats } from "@/services/dashboardService";
 
 const EFriDashboard = () => {
   const { user } = useSession();
 
+  // Reactive counts from localStorage (strictly user-added to start at zero)
+  const getResourceCount = () => {
+    const stored = JSON.parse(localStorage.getItem("unilib_resources") || "[]");
+    return stored.length;
+  };
 
-  // Fetch real dashboard stats from backend
-  const { data: stats, loading, error } = useDataFetch(fetchResourceStats, []);
+  const getRecentResourceCount = () => {
+    const stored = JSON.parse(localStorage.getItem("unilib_resources") || "[]");
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
+    return stored.filter((r: any) => {
+      const parts = r.date.split('/');
+      const d = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+      return d >= sevenDaysAgo;
+    }).length;
+  };
 
-  if (loading) {
-    return <div className="p-8 text-center">Chargement du tableau de bord...</div>;
-  }
-  if (error) {
-    return <div className="p-8 text-center text-red-500">Erreur lors du chargement des statistiques.</div>;
-  }
+  const getCoursCount = () => {
+    const stored = JSON.parse(localStorage.getItem("unilib_cours") || "[]");
+    return stored.length;
+  };
+
+  const getDownloadCount = () => {
+    if (!user?.email) return 0;
+    const stored = localStorage.getItem(`unilib_download_count_${user.email}`) || "0";
+    return parseInt(stored);
+  };
 
   return (
     <div className="space-y-6 pb-20 lg:pb-0 animate-in fade-in slide-in-from-bottom-4 duration-700">
       {/* Greeting */}
-      <h1 className="font-poppins font-semibold text-2xl text-secondary">
+      <h1 className="font-poppins font-semibold text-2xl text-foreground text-secondary">
         Bienvenue, {user?.prenom || "Étudiant"} 👋
       </h1>
 
@@ -36,9 +51,9 @@ const EFriDashboard = () => {
             </div>
             <span className="font-inter text-sm text-muted-foreground">Dernières ressources</span>
           </div>
-          <p className="font-poppins font-bold text-2xl text-foreground">{stats?.totalResources ?? 0}</p>
+          <p className="font-poppins font-bold text-2xl text-foreground">{getResourceCount()}</p>
           <p className="font-inter text-xs text-muted-foreground mt-1">
-            {stats?.recentResourcesCount ?? 0} nouvelles cette semaine
+            {getRecentResourceCount()} nouvelles cette semaine
           </p>
         </div>
 
@@ -49,7 +64,7 @@ const EFriDashboard = () => {
             </div>
             <span className="font-inter text-sm text-muted-foreground">Cours pratiques</span>
           </div>
-          <p className="font-poppins font-bold text-2xl text-foreground">{stats?.coursCount ?? 0}</p>
+          <p className="font-poppins font-bold text-2xl text-foreground">{getCoursCount()}</p>
           <p className="font-inter text-xs text-muted-foreground mt-1">supports disponibles</p>
         </div>
 
@@ -71,7 +86,7 @@ const EFriDashboard = () => {
             </div>
             <span className="font-inter text-sm text-muted-foreground">Téléchargements</span>
           </div>
-          <p className="font-poppins font-bold text-2xl text-foreground">{stats?.totalDownloads ?? 0}</p>
+          <p className="font-poppins font-bold text-2xl text-foreground">{getDownloadCount()}</p>
           <p className="font-inter text-xs text-muted-foreground mt-1">total effectués</p>
         </div>
       </div>
