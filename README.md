@@ -37,7 +37,7 @@ Plateforme centralisée de ressources académiques pour les étudiants et enseig
 | Routage         | React Router DOM 6       |
 | UI Components   | shadcn/ui (Radix UI)     |
 | Style           | Tailwind CSS 3           |
-| State / Session | `localStorage` + hooks   |
+| State / Session | Base de données + hooks  |
 | Formulaires     | React Hook Form + Zod    |
 | Backend         | Django Rest Framework    |
 | Formulaires     | React Hook Form + Zod    |
@@ -109,6 +109,11 @@ UNILIB/
 │ ├── layouts/ # DashboardLayout (sidebar, header, notifications)
 │ ├── pages/ # Pages principales (EFriLanding, EFriSignup, etc.)
 │ └── App.tsx # Routeur principal
+├── unilib_backend
+│ ├── authentication/
+│ ├── backend_project
+│ ├── media
+│ ├── resources
 ├── package.json
 ├── tailwind.config.ts
 ├── vite.config.ts
@@ -138,13 +143,13 @@ UNILIB/
 
 ## Identifiants de Test
 
-Ces comptes sont pré-enregistrés dans `src/data/mockData.ts` et fonctionnent immédiatement sans configuration.
+Ces comptes sont pré-enregistrés dans l'admin django et fonctionnent immédiatement sans configuration.
 
 | Rôle           | Email                     | Mot de passe  |
 | -------------- | ------------------------- | ------------- |
-| 🎓 Étudiant    | `marcel@gmail.com`        | `password123` |
-| 🧑‍🏫 Responsable | `marie.coord@outlook.com` | `password123` |
-| 🛡 Admin       | `admin.ifri@unilib.bj`    | `admin`       |
+| 🎓 Étudiant    | `will@ifri.edu`           | `Wh@tever`    |
+| 🧑‍🏫 Responsable | `marie.coord@outlook.com` | `C@ntusee` |
+| 🛡 Admin       | `admin@unilib.bj`          | `admin123`    |
 
 ## Se connecter / S'inscrire
 
@@ -191,70 +196,75 @@ Ces comptes sont pré-enregistrés dans `src/data/mockData.ts` et fonctionnent i
 - **Filières disponibles :** Genie Logiciel · Intelligence Artificielle · Securite Informatique · SEiot · Internet Multimedia
 - **Types de ressources :** Cours · TD · TP · Examen · Correction · Projet
 
+Le backend est construit avec **Python 3** et le framework **Django**. Il utilise **Django REST Framework (DRF)** pour fournir une API et **SimpleJWT** pour l'authentification.
+
+## 🏗️ Architecture du Projet
+
+Le dossier `unilib_backend/` est structuré comme suit :
+
+### 1. Dossier `backend_project/`
+C'est le dossier de configuration principale.
+- `settings.py` : Contient toute la configuration (Apps, Middleware, JWT, CORS, et Base de données).
+- `urls.py` : Définit les routes de base.
+
+### 2. Dossier `authentication/`
+Gère les comptes utilisateurs et les profils.
+- `models.py` : Contient le modèle `User` (voir section base de données).
+- `serializers.py` : Prépare les données pour être envoyées au Frontend (JSON).
+- `views.py` : Logique de traitement des requêtes (Inscription, Connexion, Profil).
+
+### 3. Dossier `resources/`
+Gère les ressources.
+- `models.py` : Contient le modèle `Resource` (voir section base de données).
+- `serializers.py` : Prépare les données pour être envoyées au Frontend (JSON).
+- `views.py` : Logique de traitement des requêtes (Affichage des fichiers, etc).
+
+## 🗄️ Base de Données
+
+### Type de Base de Données 
+Pour la phase de développement, nous utilisons **SQLite**.
+- **Fichier** : `unilib_backend/db.sqlite3`
+- **Pourquoi ?** : SQLite est une base de données légère, sans serveur, qui stocke tout dans un seul fichier. C'est idéal pour le développement rapide et le partage de projet.
+
+Pour le déploiement en production, nous utilisons **PostgreSQL** sur render.
+
+### Schéma de la Table Utilisateur (`authentication_user`)
+Nous utilisons un modèle utilisateur personnalisé qui remplace le modèle par défaut de Django. Voici les colonnes principales :
+
+| Champ | Type | Description |
+| :--- | :--- | :--- |
+| `username` | String | Identifiant unique (Email ou matricule). |
+| `email` | String | Email institutionnel (@ifri.uac.bj). |
+| `nom` | String | Nom de famille de l'étudiant. |
+| `prenom` | String | Prénom de l'étudiant. |
+| `filiere` | String | Branche d'étude (ex: Génie Logiciel). |
+| `promotion` | String | Niveau d'étude (L1, L2, L3...). |
+| `semestre` | String | Semestre actuel (S1, S2...). |
+| `role` | Choice | `etudiant` (défaut) ou `admin`. |
+| `avatar` | Image | Photo de profil (stockée dans `media/avatars/`). |
+
+### Migrations
+Toute modification du fichier `models.py` doit être récutée sur la base de données via :
+1. `python manage.py makemigrations` (Prépare le changement).
+2. `python manage.py migrate` (Applique le changement au fichier `.sqlite3` et à la base de données `PostgreSQL` lorsqu'on déploie).
+
+## 🔐 Accès et Administration
+
+### Django Admin
+L'interface d'administration est accessible pour gérer directement les données.
+- **URL** : [http://127.0.0.1:8000/admin/]
+- **Super Utilisateur créés** :
+  - **Login** : `admin`
+  - **Mot de passe** : `admin123`
+
+### Commandes Utiles
+- **Lancer le serveur** : `python manage.py runserver`
+- **Créer un nouveau super-admin** : `python manage.py createsuperuser`
+
+## ⚙️ Configuration Spéciale (Settings)
+- **CORS** : Configuré pour autoriser les requêtes provenant du Frontend (Vite/React).
+- **JWT** : Les tokens expirent après 24h pour la sécurité.
+- **MEDIA_URL** : Configuré pour servir les avatars téléchargés.
+
 _Développé dans le cadre du Hackathon IFRI 2026 · © IFRI-UAC · Tous droits réservés_
 
-## Intégration Backend & Déploiement
-
-Cette section explique comment relier le frontend au backend (localement et en production) et quelles variables d'environnement définir.
-
-- Frontend env (fichier `.env` à la racine du projet ou variables CI/CD) :
-
-```
-VITE_API_BASE_URL=https://api.mondomaine.tld/api   # URL publique du backend (terminée par /api)
-VITE_USE_MOCK_DATA=false                           # false pour utiliser l'API réelle
-```
-
-- Backend env (Django) :
-
-```
-SECRET_KEY=...                                    # clé secrète
-DEBUG=False
-ALLOWED_HOSTS=your-domain.com
-DATABASE_URL=postgres://user:pass@host:5432/dbname
-CORS_ALLOWED_ORIGINS=https://app.mondomaine.tld
-```
-
-Commands locales (développement)
-
-1) Démarrer le backend Django (depuis `unilib_backend`)
-
-```bash
-python -m venv .venv
-source .venv/Scripts/activate  # Windows PowerShell: .venv\Scripts\Activate.ps1
-pip install -r requirements.txt
-python manage.py migrate
-python manage.py runserver 0.0.0.0:8000
-```
-
-2) Démarrer le frontend (depuis la racine `UNILIB`)
-
-```bash
-# si vous voulez pointer explicitement vers le backend local
-export VITE_API_BASE_URL=http://localhost:8000/api
-export VITE_USE_MOCK_DATA=false
-npm install
-npm run dev
-```
-
-Tests rapides à effectuer après connexion :
-- POST `/api/auth/login/` → retourne `access` + `refresh` (le frontend envoie `username` = email)
-- GET `/api/auth/me/` avec header `Authorization: Bearer <access>` → retourne l'utilisateur
-- GET `/api/resources/` et POST `/api/resources/` (multipart/form-data) pour upload
-
-Notes de déploiement
-- Option 1 (séparer frontend / backend) :
-	- Déployer le frontend (Vite) sur Vercel / Netlify. Définir `VITE_API_BASE_URL` en production.
-	- Déployer le backend Django sur Render / Railway / DigitalOcean App / Heroku + config DB.
-
-- Option 2 (servir le build frontend via Django)
-	- `npm run build` → copie le dossier `dist` dans `unilib_backend/staticfiles` ou configure le serveur pour servir `dist`.
-	- Exécuter `python manage.py collectstatic` puis servir via Gunicorn + Nginx, ou utiliser `whitenoise` (déjà configuré).
-
-Conseils de sécurité pour la production
-- Désactiver `CORS_ALLOW_ALL_ORIGINS` et définir `CORS_ALLOWED_ORIGINS`.
-- Mettre `DEBUG=False` et définir `ALLOWED_HOSTS`.
-- Utiliser HTTPS (certificats TLS) et des tokens JWT avec durées raisonnables.
-
-Si vous voulez, je peux :
-- exécuter quelques tests d'API locaux (login / getCurrentUser) si vous voulez lancer les serveurs, ou
-- préparer des fichiers `.env.example` et un guide de déploiement plus détaillé pour une cible (Vercel + Render / Docker). 
