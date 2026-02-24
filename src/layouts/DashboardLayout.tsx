@@ -13,7 +13,7 @@ const navItems = [
   { label: "Emploi du Temps", icon: Calendar, path: "/e-fri/emploi-du-temps" },
   { label: "IA Assistant", icon: Bot, path: "/e-fri/ia" },
   { label: "Téléverser", icon: Upload, path: "/e-fri/televerser", roles: ["responsable", "admin"] },
-  { label: "Administration", icon: Settings, path: "http://localhost:8000/admin", roles: ["admin"], external: true },
+  { label: "Administration", icon: Settings, path: "https://unilib-backend.onrender.com/admin", roles: ["admin"], external: true },
   { label: "Paramètres", icon: Settings, path: "/e-fri/profil" },
 ];
 
