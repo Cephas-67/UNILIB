@@ -1,7 +1,8 @@
 from rest_framework import serializers
-from .models import User
+from .models import User, ResponsableCode
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.contrib.auth import authenticate
+from django.utils import timezone
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -11,12 +12,35 @@ class UserSerializer(serializers.ModelSerializer):
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, min_length=8)
+    verification_code = serializers.CharField(write_only=True, required=False, allow_blank=True)
+    role = serializers.CharField(write_only=True, default='etudiant')
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'password', 'nom', 'prenom', 'filiere', 'promotion', 'semestre']
+        fields = ['username', 'email', 'password', 'nom', 'prenom', 'filiere', 'promotion', 'semestre', 'role', 'verification_code']
+
+    def validate(self, data):
+        role = data.get('role', 'etudiant')
+        
+        # Si responsable, vérifier le code dans la base de données
+        if role == 'responsable':
+            code = data.get('verification_code')
+            if not code:
+                raise serializers.ValidationError({'verification_code': 'Un code de vérification est requis pour les responsables'})
+            
+            try:
+                code_obj = ResponsableCode.objects.get(code=code.upper(), used=False)
+                data['_code_obj'] = code_obj  # Stocker pour utilisation dans create()
+            except ResponsableCode.DoesNotExist:
+                raise serializers.ValidationError({'verification_code': 'Code invalide ou déjà utilisé'})
+        
+        return data
 
     def create(self, validated_data):
+        role = validated_data.pop('role', 'etudiant')
+        validated_data.pop('verification_code', None)
+        code_obj = validated_data.pop('_code_obj', None)
+        
         user = User.objects.create_user(
             username=validated_data['username'],
             email=validated_data['email'],
@@ -25,8 +49,17 @@ class RegisterSerializer(serializers.ModelSerializer):
             prenom=validated_data['prenom'],
             filiere=validated_data.get('filiere', ''),
             promotion=validated_data.get('promotion', ''),
-            semestre=validated_data.get('semestre', '')
+            semestre=validated_data.get('semestre', ''),
+            role=role
         )
+        
+        # Marquer le code comme utilisé
+        if code_obj:
+            code_obj.used = True
+            code_obj.used_by = user
+            code_obj.used_at = timezone.now()
+            code_obj.save()
+        
         return user
 
 class EmailTokenObtainPairSerializer(TokenObtainPairSerializer):

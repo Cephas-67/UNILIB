@@ -40,15 +40,9 @@ const EFriSignup = () => {
     if (!form.password) errs.password = "Requis";
     else if (form.password.length < 8) errs.password = "Minimum 8 caractères";
     if (form.password !== form.confirmPassword) errs.confirmPassword = "Les mots de passe ne correspondent pas";
-    if (form.role === "responsable") {
-      if (!form.verificationCode) {
-        errs.verificationCode = "Un code de vérification est requis";
-      } else {
-        const storedCodes = JSON.parse(localStorage.getItem("unilib_resp_codes") || "[]");
-        const validCode = storedCodes.find((c: any) => c.code === form.verificationCode.toUpperCase() && !c.used);
-        if (!validCode) errs.verificationCode = "Code invalide ou déjà utilisé";
-      }
-    }
+    if (form.role === "responsable" && !form.verificationCode) {
+    errs.verificationCode = "Un code de vérification est requis";
+  }
     if (!form.cgu) errs.cgu = "Vous devez accepter les CGU";
     setErrors(errs);
     return Object.keys(errs).length === 0;
@@ -71,6 +65,8 @@ const handleSubmit = async (e: React.FormEvent) => {
       nom: form.nom,
       prenom: form.prenom,
       filiere: form.filiere,
+      role: form.role, 
+      verification_code: form.role === 'responsable' ? form.verificationCode : undefined,
     });
     
     console.log('✅ Inscription réussie');
@@ -93,6 +89,15 @@ const handleSubmit = async (e: React.FormEvent) => {
     
   } catch (error: any) {
     console.error('❌ Registration error:', error);
+
+    // Afficher l'erreur du backend
+    const errorMessage = error.message || "L'inscription a échoué.";
+    
+    // Si c'est une erreur de code, l'afficher dans le champ
+    if (errorMessage.includes('Code')) {
+      setErrors({ verificationCode: errorMessage });
+    }
+    
     toast({
       title: "Erreur d'inscription",
       description: error.message || "L'inscription a échoué.",

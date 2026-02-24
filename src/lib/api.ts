@@ -30,6 +30,7 @@ export const register = async (data: {
   promotion?: string;
   semestre?: string;
   role?: string;
+  verification_code?: string;
 }) => {
   // Ensure a username exists (backend expects `username` field)
 const payload = { 
@@ -38,7 +39,7 @@ const payload = {
     promotion: data.promotion || '',  // Valeur par défaut vide
     semestre: data.semestre || ''
   };
-  
+
   const response = await fetch(`${API_URL}/auth/register/`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
