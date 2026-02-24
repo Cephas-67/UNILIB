@@ -90,6 +90,9 @@ if IS_PRODUCTION:
         'API_SECRET': config('CLOUDINARY_API_SECRET'),
         'SECURE': True,
     }
+    # Test Cloudinary credentials
+    if not CLOUDINARY_STORAGE['CLOUD_NAME'] or not CLOUDINARY_STORAGE['API_KEY'] or not CLOUDINARY_STORAGE['API_SECRET']:
+        raise Exception("Cloudinary credentials missing! Vérifie tes variables d'environnement sur Render.")
     DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
     MEDIA_URL = ''
 else:
