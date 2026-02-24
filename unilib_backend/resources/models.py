@@ -1,6 +1,7 @@
 from django.db import models
 from authentication.models import User
 import uuid
+from cloudinary_storage.storage import MediaCloudinaryStorage
 
 class Resource(models.Model):
     TYPE_CHOICES = [
@@ -35,7 +36,7 @@ class Resource(models.Model):
     filiere = models.CharField(max_length=50, choices=FILIERE_CHOICES)
     promotion = models.CharField(max_length=10, choices=PROMOTION_CHOICES)
     semestre = models.IntegerField()
-    fichier = models.FileField(upload_to='resources/%Y/%m/')
+    fichier = models.FileField(upload_to='resources/%Y/%m/', storage=MediaCloudinaryStorage())
     uploaded_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='resources')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
