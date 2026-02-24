@@ -98,11 +98,11 @@ const EFriResources = () => {
           matiere: r.matiere,
           filiere: mapFiliereFromBackend(r.filiere),
           promotion: mapPromotionFromBackend(r.promotion),
-          semestre: `S${r.semestre}`, // 1 → S1
+          semestre: `S${r.semestre}`,
           type: mapTypeFromBackend(r.type_ressource),
           date: new Date(r.created_at).toLocaleDateString('fr-FR'),
-          format: r.fichier.split('.').pop()?.toUpperCase() || "PDF",
-          fileUrl: r.fichier, // URL complète du fichier depuis le backend
+          format: (r.fichier_url || r.fichier || '').split('.').pop()?.toUpperCase() || "PDF",
+          fileUrl: r.fichier_url || r.fichier || '', // Prend le lien Cloudinary si dispo
           description: r.description || "",
           uploaded_by: r.uploaded_by,
         }));
