@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import UniLibLogo from "@/components/UniLibLogo";
 import { Mail, Lock, Eye, EyeOff, User } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { register } from "@/lib/api";
 
 const filieres = ["Genie Logiciel", "Intelligence Artificielle", "Securite Informatique", "SEiot", "Internet Multimedia"];
 
@@ -53,27 +54,28 @@ const EFriSignup = () => {
     return Object.keys(errs).length === 0;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!validate()) return;
-    setLoading(true);
-    await new Promise((r) => setTimeout(r, 1500));
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  if (!validate()) return;
+  
+  setLoading(true);
 
-    // Simuler l'enregistrement (localStorage persistence)
-    const newUser = {
+  try {
+    // Appel API pour inscription
+    console.log('📝 Tentative d\'inscription...', form.email);
+    
+    await register({
+      username: form.email.split('@')[0], // Générer username depuis email
       email: form.email.toLowerCase(),
       password: form.password,
       nom: form.nom,
       prenom: form.prenom,
       filiere: form.filiere,
-      role: form.role,
-      status: "active" as const
-    };
-
-    const existingUsers = JSON.parse(localStorage.getItem("unilib_users") || "[]");
-    localStorage.setItem("unilib_users", JSON.stringify([...existingUsers, newUser]));
-
-    // Consume the code if it's a responsable
+    });
+    
+    console.log('✅ Inscription réussie');
+    
+    // Consommer le code responsable si nécessaire (garde le système local)
     if (form.role === "responsable") {
       const storedCodes = JSON.parse(localStorage.getItem("unilib_resp_codes") || "[]");
       const updatedCodes = storedCodes.map((c: any) =>
@@ -82,13 +84,24 @@ const EFriSignup = () => {
       localStorage.setItem("unilib_resp_codes", JSON.stringify(updatedCodes));
     }
 
-    setLoading(false);
     toast({
       title: "Inscription réussie",
       description: "Votre compte a été créé. Vous pouvez maintenant vous connecter !"
     });
+    
     navigate("/e-fri/connexion");
-  };
+    
+  } catch (error: any) {
+    console.error('❌ Registration error:', error);
+    toast({
+      title: "Erreur d'inscription",
+      description: error.message || "L'inscription a échoué.",
+      variant: "destructive"
+    });
+  } finally {
+    setLoading(false);
+  }
+};
 
   const strength = getPasswordStrength(form.password);
   const isFormValid = form.nom && form.prenom && form.email && form.filiere && form.password && form.confirmPassword && form.cgu;

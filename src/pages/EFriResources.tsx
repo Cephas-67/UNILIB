@@ -1,8 +1,8 @@
-import { useState } from "react";
-import { Download, Eye, Heart, Share2, FileText, Grid, List, Search, Clock, Trash2 } from "lucide-react";
-import { resources } from "@/data/mockData";
+import { useState, useEffect } from "react";
+import { Download, FileText, Grid, List, Search, Clock, Trash2 } from "lucide-react";
 import { useSession } from "@/hooks/use-session";
 import { useToast } from "@/hooks/use-toast";
+import { getResources, deleteResource } from "@/lib/api";
 
 const typeColors: Record<string, string> = {
   Cours: "bg-[#E3F2FD] text-secondary",
@@ -13,41 +13,122 @@ const typeColors: Record<string, string> = {
   Correction: "bg-[#E3F2FD] text-secondary",
 };
 
-const formatIcons: Record<string, string> = { PDF: "#F44336", DOCX: "#2196F3", ZIP: "#FF9800" };
+const filieres = [
+  "Tous", 
+  "Genie Logiciel", 
+  "Intelligence Artificielle", 
+  "Securite Informatique", 
+  "SEiot", 
+  "Internet Multimedia"
+];
 
-const filieres = ["Tous", "Genie Logiciel", "Intelligence Artificielle", "Securite Informatique", "SEiot", "Internet Multimedia"];
-const promotions = ["Tous", "L1", "L2", "L3", "M1", "M2"];
+const promotions = ["Tous", "L1", "L2", "L3"];
 const semestres = ["Tous", "S1", "S2"];
 const types = ["Tous", "Cours", "TD", "TP", "Examen", "Rattrapage", "Correction"];
+
+// ─────────────────────────────────────────────────────────────
+// MAPPING BACKEND → FRONTEND
+// ─────────────────────────────────────────────────────────────
+const mapFiliereFromBackend = (filiere: string): string => {
+  const mapping: Record<string, string> = {
+    'toutes': 'Toutes',
+    'genie_logiciel': 'Genie Logiciel',
+    'intelligence_artificielle': 'Intelligence Artificielle',
+    'securite_informatique': 'Securite Informatique',
+    'seiot': 'SEiot',
+    'internet_multimedia': 'Internet Multimedia',
+  };
+  return mapping[filiere] || filiere;
+};
+
+const mapPromotionFromBackend = (promotion: string): string => {
+  return promotion.toUpperCase(); // l1 → L1
+};
+
+const mapTypeFromBackend = (type: string): string => {
+  const mapping: Record<string, string> = {
+    'cours': 'Cours',
+    'td': 'TD',
+    'tp': 'TP',
+    'examen': 'Examen',
+    'rattrapage': 'Rattrapage',
+    'correction': 'Correction',
+  };
+  return mapping[type] || type;
+};
 
 const EFriResources = () => {
   const { user } = useSession();
   const { toast } = useToast();
+  
   const [filiere, setFiliere] = useState("Tous");
   const [promotion, setPromotion] = useState("Tous");
   const [semestre, setSemestre] = useState("Tous");
   const [typeFilter, setTypeFilter] = useState("Tous");
   const [search, setSearch] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  
+  const [allResources, setAllResources] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  
   const isAdmin = user?.role === "admin";
 
-  // Load from localStorage + mockData
-  const [allResources, setAllResources] = useState(() => {
-    const stored = localStorage.getItem("unilib_resources");
-    const parsed = stored ? JSON.parse(stored) : [];
-    return [...resources, ...parsed];
-  });
+  // ─────────────────────────────────────────────────────────────
+  // CHARGER LES RESSOURCES DEPUIS L'API
+  // ─────────────────────────────────────────────────────────────
+  useEffect(() => {
+    const fetchResources = async () => {
+      setLoading(true);
+      setError(null);
+      
+      try {
+        const data = await getResources({
+          filiere: filiere !== "Tous" ? filiere : undefined,
+          promotion: promotion !== "Tous" ? promotion : undefined,
+          semestre: semestre !== "Tous" ? semestre : undefined,
+          type: typeFilter !== "Tous" ? typeFilter : undefined,
+          search: search || undefined,
+        });
+        
+        // Transformer les données backend pour l'affichage
+        const transformedData = data.map((r: any) => ({
+          id: r.id,
+          titre: r.titre,
+          matiere: r.matiere,
+          filiere: mapFiliereFromBackend(r.filiere),
+          promotion: mapPromotionFromBackend(r.promotion),
+          semestre: `S${r.semestre}`, // 1 → S1
+          type: mapTypeFromBackend(r.type_ressource),
+          date: new Date(r.created_at).toLocaleDateString('fr-FR'),
+          format: r.fichier.split('.').pop()?.toUpperCase() || "PDF",
+          fileUrl: r.fichier, // URL complète du fichier depuis le backend
+          description: r.description || "",
+          uploaded_by: r.uploaded_by,
+        }));
+        
+        setAllResources(transformedData);
+      } catch (err: any) {
+        console.error('Error fetching resources:', err);
+        setError(err.message);
+        toast({
+          title: "Erreur",
+          description: "Impossible de charger les ressources",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const filtered = allResources.filter(r => {
-    if (filiere !== "Tous" && r.filiere !== filiere) return false;
-    if (promotion !== "Tous" && r.promotion !== promotion) return false;
-    if (semestre !== "Tous" && r.semestre !== semestre) return false;
-    if (typeFilter !== "Tous" && r.type !== typeFilter) return false;
-    const searchLow = search.toLowerCase();
-    if (search && !r.titre.toLowerCase().includes(searchLow) && !r.matiere.toLowerCase().includes(searchLow)) return false;
-    return true;
-  });
+    if (user) {
+      fetchResources();
+    }
+  }, [user, filiere, promotion, semestre, typeFilter, search, toast]);
 
+  // ─────────────────────────────────────────────────────────────
+  // TÉLÉCHARGEMENT
+  // ─────────────────────────────────────────────────────────────
   const trackDownload = () => {
     if (!user?.email) return;
     const key = `unilib_download_count_${user.email}`;
@@ -57,45 +138,81 @@ const EFriResources = () => {
 
   const handleDownload = (r: any) => {
     trackDownload();
-    // If it's a real file (Data URL or Blob URL), download it
-    if (r.fileUrl) {
-      const link = document.createElement("a");
-      link.href = r.fileUrl;
-      link.download = `${r.titre}.${r.format || 'pdf'}`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } else {
-      // For mock data, simulate download
-      const blob = new Blob(["Contenu du document de simulation"], { type: "text/plain" });
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `${r.titre}.txt`;
-      link.click();
-    }
+    
+    // Télécharger le fichier depuis le backend
+    const link = document.createElement("a");
+    link.href = r.fileUrl; // URL complète du fichier (ex: http://127.0.0.1:8000/media/resources/2024/01/file.pdf)
+    link.download = `${r.titre}.${r.format.toLowerCase()}`;
+    link.target = "_blank";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    toast({
+      title: "Téléchargement",
+      description: `${r.titre} en cours de téléchargement...`,
+    });
   };
 
-  const handleDelete = (id: string) => {
-    const updated = allResources.filter(r => r.id !== id);
-    setAllResources(updated);
-
-    // Also update localStorage (only for user-added resources)
-    const stored = localStorage.getItem("unilib_resources");
-    if (stored) {
-      const parsed = JSON.parse(stored);
-      const filtered = parsed.filter((r: any) => r.id !== id);
-      localStorage.setItem("unilib_resources", JSON.stringify(filtered));
+  // ─────────────────────────────────────────────────────────────
+  // SUPPRESSION (Admin uniquement)
+  // ─────────────────────────────────────────────────────────────
+  const handleDelete = async (id: string) => {
+    if (!confirm("Voulez-vous vraiment supprimer cette ressource ?")) return;
+    
+    try {
+      await deleteResource(id);
+      
+      // Retirer de la liste locale
+      setAllResources(prev => prev.filter(r => r.id !== id));
+      
+      toast({
+        title: "Ressource supprimée",
+        description: "Le document a été retiré de la bibliothèque.",
+      });
+    } catch (error: any) {
+      console.error('Delete error:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de supprimer la ressource.",
+        variant: "destructive"
+      });
     }
-
-    toast({
-      title: "Ressource supprimée",
-      description: "Le document a été retiré de la bibliothèque.",
-    });
   };
 
   const selectClass = "px-3 py-2 rounded-lg border border-border bg-background font-inter text-sm outline-none focus:border-secondary transition-all";
 
+  // ─────────────────────────────────────────────────────────────
+  // ÉTATS DE CHARGEMENT
+  // ─────────────────────────────────────────────────────────────
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="flex flex-col items-center gap-3">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+          <p className="font-inter text-sm text-muted-foreground">Chargement des ressources...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
+        <p className="text-destructive font-inter text-sm">Erreur : {error}</p>
+        <button 
+          onClick={() => window.location.reload()} 
+          className="px-4 py-2 bg-primary text-primary-foreground rounded-lg font-inter text-sm hover:opacity-90"
+        >
+          Réessayer
+        </button>
+      </div>
+    );
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // RENDU PRINCIPAL
+  // ─────────────────────────────────────────────────────────────
   return (
     <div className="space-y-6 pb-20 lg:pb-0">
       {/* Filters */}
@@ -104,12 +221,15 @@ const EFriResources = () => {
           <select value={filiere} onChange={e => setFiliere(e.target.value)} className={selectClass}>
             {filieres.map(f => <option key={f}>{f}</option>)}
           </select>
+          
           <select value={promotion} onChange={e => setPromotion(e.target.value)} className={selectClass}>
             {promotions.map(p => <option key={p}>{p}</option>)}
           </select>
+          
           <select value={semestre} onChange={e => setSemestre(e.target.value)} className={selectClass}>
             {semestres.map(s => <option key={s}>{s}</option>)}
           </select>
+          
           <div className="relative flex-1 min-w-0 sm:col-span-2 lg:col-span-1">
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
             <input
@@ -122,71 +242,118 @@ const EFriResources = () => {
         </div>
 
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div className="flex gap-2 overflow-x-auto pb-2 sm:pb-0 w-full sm:w-auto no-scrollbar mask-fade-right">
+          <div className="flex gap-2 overflow-x-auto pb-2 sm:pb-0 w-full sm:w-auto no-scrollbar">
             {types.map(t => (
-              <button key={t} onClick={() => setTypeFilter(t)} className={`px-4 py-1.5 rounded-lg border font-inter text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider transition-all whitespace-nowrap ${typeFilter === t ? "bg-secondary border-secondary text-secondary-foreground shadow-md shadow-secondary/20" : "bg-background border-border text-muted-foreground hover:bg-muted"}`}>{t}</button>
+              <button 
+                key={t} 
+                onClick={() => setTypeFilter(t)} 
+                className={`px-4 py-1.5 rounded-lg border font-inter text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider transition-all whitespace-nowrap ${
+                  typeFilter === t 
+                    ? "bg-secondary border-secondary text-secondary-foreground shadow-md shadow-secondary/20" 
+                    : "bg-background border-border text-muted-foreground hover:bg-muted"
+                }`}
+              >
+                {t}
+              </button>
             ))}
           </div>
+          
           <div className="flex gap-1 bg-muted/50 p-1 rounded-lg self-end sm:self-auto">
-            <button onClick={() => setViewMode("grid")} className={`p-1.5 rounded ${viewMode === "grid" ? "bg-background text-secondary shadow-sm" : "text-muted-foreground hover:text-foreground"}`}><Grid size={16} /></button>
-            <button onClick={() => setViewMode("list")} className={`p-1.5 rounded ${viewMode === "list" ? "bg-background text-secondary shadow-sm" : "text-muted-foreground hover:text-foreground"}`}><List size={16} /></button>
+            <button 
+              onClick={() => setViewMode("grid")} 
+              className={`p-1.5 rounded ${viewMode === "grid" ? "bg-background text-secondary shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
+            >
+              <Grid size={16} />
+            </button>
+            <button 
+              onClick={() => setViewMode("list")} 
+              className={`p-1.5 rounded ${viewMode === "list" ? "bg-background text-secondary shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
+            >
+              <List size={16} />
+            </button>
           </div>
         </div>
       </div>
 
       {/* Results */}
       <div className="flex items-center justify-between">
-        <p className="font-inter text-sm text-muted-foreground"><span className="font-bold text-foreground">{filtered.length}</span> documents trouvés</p>
+        <p className="font-inter text-sm text-muted-foreground">
+          <span className="font-bold text-foreground">{allResources.length}</span> document{allResources.length > 1 ? 's' : ''} trouvé{allResources.length > 1 ? 's' : ''}
+        </p>
       </div>
 
-      <div className={viewMode === "grid" ? "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5" : "space-y-3"}>
-        {filtered.map(r => (
-          <div key={r.id} className="group bg-background rounded-xl border border-border overflow-hidden hover:border-secondary hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300">
-            <div className="p-4 space-y-4">
-              <div className="flex items-start gap-3">
-                <div className={`w-11 h-11 rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm ${typeColors[r.type as keyof typeof typeColors] || "bg-muted text-muted-foreground"}`}>
-                  <FileText size={22} strokeWidth={2.5} />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-[10px] font-bold text-secondary uppercase tracking-[0.1em]">{r.matiere}</span>
+      {allResources.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-12 space-y-3">
+          <FileText size={48} className="text-muted-foreground opacity-30" />
+          <p className="font-inter text-sm text-muted-foreground">Aucune ressource disponible</p>
+          <p className="font-inter text-xs text-muted-foreground opacity-60">
+            Essayez de modifier vos filtres ou attendez que de nouvelles ressources soient ajoutées.
+          </p>
+        </div>
+      ) : (
+        <div className={viewMode === "grid" ? "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5" : "space-y-3"}>
+          {allResources.map(r => (
+            <div 
+              key={r.id} 
+              className="group bg-background rounded-xl border border-border overflow-hidden hover:border-secondary hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300"
+            >
+              <div className="p-4 space-y-4">
+                <div className="flex items-start gap-3">
+                  <div className={`w-11 h-11 rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm ${
+                    typeColors[r.type as keyof typeof typeColors] || "bg-muted text-muted-foreground"
+                  }`}>
+                    <FileText size={22} strokeWidth={2.5} />
                   </div>
-                  <h3 className="font-poppins font-semibold text-sm text-foreground line-clamp-2 leading-snug group-hover:text-secondary transition-colors">
-                    {r.titre}
-                  </h3>
+                  
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-[10px] font-bold text-secondary uppercase tracking-[0.1em]">
+                        {r.matiere}
+                      </span>
+                    </div>
+                    <h3 className="font-poppins font-semibold text-sm text-foreground line-clamp-2 leading-snug group-hover:text-secondary transition-colors">
+                      {r.titre}
+                    </h3>
+                    <p className="font-inter text-[10px] text-muted-foreground mt-1">
+                      {r.filiere} · {r.promotion} · {r.semestre}
+                    </p>
+                  </div>
+                  
+                  {isAdmin && (
+                    <button
+                      onClick={() => handleDelete(r.id)}
+                      className="p-2 text-muted-foreground hover:text-destructive transition-colors rounded-lg hover:bg-destructive/5"
+                      title="Supprimer la ressource"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  )}
                 </div>
-                {isAdmin && (
+
+                <div className="flex items-center justify-between pt-3 border-t border-border/50">
+                  <div className="flex items-center gap-3">
+                    <span className="font-inter text-[10px] font-medium text-muted-foreground flex items-center gap-1">
+                      <Clock size={12} /> {r.date}
+                    </span>
+                    <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-widest ${
+                      typeColors[r.type as keyof typeof typeColors] || "bg-muted text-muted-foreground"
+                    }`}>
+                      {r.type}
+                    </span>
+                  </div>
+
                   <button
-                    onClick={(e) => { e.stopPropagation(); handleDelete(r.id); }}
-                    className="p-2 text-muted-foreground hover:text-destructive transition-colors rounded-lg hover:bg-destructive/5"
-                    title="Supprimer la ressource"
+                    onClick={() => handleDownload(r)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-secondary/10 text-secondary hover:bg-secondary hover:text-secondary-foreground transition-all duration-300 font-inter text-[11px] font-bold"
                   >
-                    <Trash2 size={16} />
+                    <Download size={14} /> Télécharger
                   </button>
-                )}
-              </div>
-
-              <div className="flex items-center justify-between pt-3 border-t border-border/50">
-                <div className="flex items-center gap-3">
-                  <span className="font-inter text-[10px] font-medium text-muted-foreground flex items-center gap-1">
-                    <Clock size={12} /> {r.date}
-                  </span>
-                  <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-widest ${typeColors[r.type as keyof typeof typeColors] || "bg-muted text-muted-foreground"}`}>
-                    {r.type}
-                  </span>
                 </div>
-
-                <button
-                  onClick={() => handleDownload(r)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-secondary/10 text-secondary hover:bg-secondary hover:text-secondary-foreground transition-all duration-300 font-inter text-[11px] font-bold"
-                >
-                  <Download size={14} /> Télécharger
-                </button>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

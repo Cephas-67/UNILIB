@@ -46,6 +46,14 @@ const EFriProjects = () => {
   const isAdmin = user?.role === "admin";
   const filtered = filter === "Tous" ? cours : cours.filter(p => p.difficulte === filter);
 
+  // Defensive helpers: older/localStorage data may have `stack`, `apis`, `etapes` as strings
+  const asArray = (val: any) => {
+    if (!val) return [];
+    if (Array.isArray(val)) return val;
+    if (typeof val === 'string') return val.split(',').map((s) => s.trim()).filter(Boolean);
+    return [];
+  };
+
   const handleAddLink = () => {
     setNewCours({
       ...newCours,
@@ -361,10 +369,10 @@ const EFriProjects = () => {
                   <p className="font-inter text-xs text-muted-foreground mb-4 line-clamp-2">{p.description}</p>
 
                   <div className="flex flex-wrap gap-1.5 mb-4">
-                    {p.stack.slice(0, 3).map((t: string) => (
+                    {asArray(p.stack).slice(0, 3).map((t: string) => (
                       <span key={t} className="px-2 py-0.5 rounded-full bg-muted text-[10px] font-inter text-foreground">{t}</span>
                     ))}
-                    {p.stack.length > 3 && <span className="text-[10px] text-muted-foreground font-inter">+{p.stack.length - 3}</span>}
+                    {asArray(p.stack).length > 3 && <span className="text-[10px] text-muted-foreground font-inter">+{asArray(p.stack).length - 3}</span>}
                   </div>
 
                   <div className="flex items-center justify-between pt-4 border-t border-border">
@@ -412,7 +420,7 @@ const EFriProjects = () => {
                           <Cpu size={16} className="text-secondary" /> Concepts clés
                         </h4>
                         <div className="flex flex-wrap gap-2">
-                          {selectedProject.stack.map((t: string) => (
+                          {asArray(selectedProject.stack).map((t: string) => (
                             <span key={t} className="px-2.5 py-1 rounded bg-secondary/10 text-secondary font-inter text-xs">
                               {t}
                             </span>
@@ -424,7 +432,7 @@ const EFriProjects = () => {
                           <Zap size={16} className="text-accent" /> Modules pratiques
                         </h4>
                         <ul className="space-y-1">
-                          {selectedProject.apis.map((a: string) => (
+                          {asArray(selectedProject.apis).map((a: string) => (
                             <li key={a} className="font-inter text-xs text-muted-foreground flex items-center gap-2">
                               <div className="w-1 h-1 rounded-full bg-accent" /> {a}
                             </li>
@@ -439,7 +447,7 @@ const EFriProjects = () => {
                         <Info size={16} className="text-primary" /> Guide d'apprentissage
                       </h4>
                       <div className="space-y-3">
-                        {selectedProject.etapes.map((e: string, i: number) => (
+                        {asArray(selectedProject.etapes).map((e: string, i: number) => (
                           <div key={i} className="flex gap-3">
                             <span className="flex-shrink-0 w-5 h-5 rounded-full bg-background border border-border flex items-center justify-center text-[10px] font-bold text-muted-foreground">
                               {i + 1}

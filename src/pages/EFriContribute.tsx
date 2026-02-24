@@ -2,9 +2,18 @@ import { useState } from "react";
 import { Upload, FileText, X, Check, ChevronRight, ChevronLeft, ShieldCheck, FileUp, Info, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useSession } from "@/hooks/use-session";
+import { uploadResource } from "@/lib/api";
 
-const filieres = ["Toutes", "Genie Logiciel", "Intelligence Artificielle", "Securite Informatique", "SEiot", "Internet Multimedia"];
-const promotions = ["L1", "L2", "L3", "M1", "M2"];
+const filieres = [
+  "Genie Logiciel", 
+  "Intelligence Artificielle", 
+  "Securite Informatique", 
+  "SEiot", 
+  "Internet Multimedia"
+];
+
+const promotions = ["L1", "L2", "L3"];
+const semestres = ["S1", "S2"];
 const typesDoc = ["Cours", "TD", "TP", "Examen", "Rattrapage", "Correction"];
 
 const EFriContribute = () => {
@@ -66,53 +75,77 @@ const EFriContribute = () => {
     if (!file) return;
 
     setUploading(true);
-    // Simulate real progress but actually prepare data
-    for (let i = 0; i <= 100; i += 20) {
-      setProgress(i);
-      await new Promise(r => setTimeout(r, 100));
-    }
+    
+    // Simuler une progression pour l'UX
+    const progressInterval = setInterval(() => {
+      setProgress(prev => {
+        if (prev >= 90) {
+          clearInterval(progressInterval);
+          return 90;
+        }
+        return prev + 10;
+      });
+    }, 200);
 
-    // Convert file to Data URL for persistence in localStorage
-    const reader = new FileReader();
-    const addNotification = (title: string, description: string) => {
+    try {
+      const formData = new FormData();
+      formData.append('titre', form.titre);
+      formData.append('matiere', form.matiere);
+      formData.append('type', form.type);
+      formData.append('filiere', form.filiere);
+      formData.append('promotion', form.promotion);
+      formData.append('semestre', form.semestre);
+      formData.append('fichier', file);
+      formData.append('description', form.description || '');
+
+      await uploadResource(formData);
+      
+      clearInterval(progressInterval);
+      setProgress(100);
+
+      // Ajouter notification localStorage (optionnel, pour compatibilité)
       const stored = JSON.parse(localStorage.getItem("unilib_notifications") || "[]");
       const newNotif = {
         id: Date.now(),
-        title,
-        description,
+        title: "Nouvelle ressource ajoutée",
+        description: `« ${form.titre} » est maintenant disponible en ${form.filiere}.`,
         time: "À l'instant",
         type: "success"
       };
       localStorage.setItem("unilib_notifications", JSON.stringify([newNotif, ...stored]));
-    };
 
-    reader.onloadend = () => {
-      const fileUrl = reader.result as string;
-      const newResource = {
-        id: Date.now().toString(),
-        titre: form.titre,
-        matiere: form.matiere,
-        filiere: form.filiere,
-        promotion: form.promotion,
-        semestre: form.semestre,
-        type: form.type,
-        date: new Date().toLocaleDateString('fr-FR'),
-        format: file.name.split('.').pop()?.toUpperCase() || "PDF",
-        fileUrl: fileUrl
-      };
-
-      const existing = JSON.parse(localStorage.getItem("unilib_resources") || "[]");
-      localStorage.setItem("unilib_resources", JSON.stringify([...existing, newResource]));
-
-      addNotification("Nouvelle ressource ajoutée", `« ${newResource.titre} » est maintenant disponible en ${newResource.filiere}.`);
-
-      setUploading(false);
-      toast({ title: "Document téléversé", description: "Votre document a été ajouté avec succès." });
+      toast({ 
+        title: "Document téléversé", 
+        description: "Votre document a été ajouté avec succès et est maintenant disponible pour les étudiants." 
+      });
+      
+      // Reset
       setFile(null);
-      setForm({ titre: "", matiere: "", enseignant: "", type: "", filiere: "", promotion: "", semestre: "S1", description: "" });
+      setForm({ 
+        titre: "", 
+        matiere: "", 
+        enseignant: "", 
+        type: "", 
+        filiere: "", 
+        promotion: "", 
+        semestre: "S1", 
+        description: "" 
+      });
       setStep(1);
-    };
-    reader.readAsDataURL(file);
+      setProgress(0);
+      
+    } catch (error: any) {
+      console.error('Upload error:', error);
+      clearInterval(progressInterval);
+      
+      toast({
+        title: "Erreur d'upload",
+        description: error.message || "Le téléversement a échoué. Veuillez réessayer.",
+        variant: "destructive"
+      });
+    } finally {
+      setUploading(false);
+    }
   };
 
   const isFormValid = form.titre && form.matiere && form.type && form.filiere && form.promotion;
@@ -135,11 +168,16 @@ const EFriContribute = () => {
         {[1, 2, 3].map((s) => (
           <div
             key={s}
-            className={`w-10 h-10 rounded-full flex items-center justify-center font-poppins font-bold transition-all duration-500 border-4 ${step >= s ? "bg-primary text-white border-primary shadow-lg shadow-primary/20 scale-110" : "bg-background text-muted-foreground border-border"
-              }`}
+            className={`w-10 h-10 rounded-full flex items-center justify-center font-poppins font-bold transition-all duration-500 border-4 ${
+              step >= s 
+                ? "bg-primary text-white border-primary shadow-lg shadow-primary/20 scale-110" 
+                : "bg-background text-muted-foreground border-border"
+            }`}
           >
             {step > s ? <Check size={20} /> : s}
-            <span className={`absolute -bottom-7 font-inter text-[10px] font-bold uppercase tracking-wider whitespace-nowrap ${step === s ? "text-primary" : "text-muted-foreground"}`}>
+            <span className={`absolute -bottom-7 font-inter text-[10px] font-bold uppercase tracking-wider whitespace-nowrap ${
+              step === s ? "text-primary" : "text-muted-foreground"
+            }`}>
               {s === 1 ? "Classification" : s === 2 ? "Fichier" : "Validation"}
             </span>
           </div>
@@ -158,7 +196,9 @@ const EFriContribute = () => {
               </div>
 
               <div className="space-y-1.5">
-                <label className="font-inter text-xs font-bold text-muted-foreground uppercase tracking-wider">Titre de la ressource</label>
+                <label className="font-inter text-xs font-bold text-muted-foreground uppercase tracking-wider">
+                  Titre de la ressource
+                </label>
                 <input
                   value={form.titre}
                   onChange={e => update("titre", e.target.value)}
@@ -168,7 +208,9 @@ const EFriContribute = () => {
               </div>
 
               <div className="space-y-1.5">
-                <label className="font-inter text-xs font-bold text-muted-foreground uppercase tracking-wider">Matière</label>
+                <label className="font-inter text-xs font-bold text-muted-foreground uppercase tracking-wider">
+                  Matière
+                </label>
                 <input
                   value={form.matiere}
                   onChange={e => update("matiere", e.target.value)}
@@ -178,7 +220,9 @@ const EFriContribute = () => {
               </div>
 
               <div className="space-y-1.5">
-                <label className="font-inter text-xs font-bold text-muted-foreground uppercase tracking-wider">Enseignant (Auteur)</label>
+                <label className="font-inter text-xs font-bold text-muted-foreground uppercase tracking-wider">
+                  Enseignant (Optionnel)
+                </label>
                 <input
                   value={form.enseignant}
                   onChange={e => update("enseignant", e.target.value)}
@@ -188,7 +232,9 @@ const EFriContribute = () => {
               </div>
 
               <div className="space-y-1.5">
-                <label className="font-inter text-xs font-bold text-muted-foreground uppercase tracking-wider">Type de document</label>
+                <label className="font-inter text-xs font-bold text-muted-foreground uppercase tracking-wider">
+                  Type de document
+                </label>
                 <select
                   value={form.type}
                   onChange={e => update("type", e.target.value)}
@@ -200,7 +246,9 @@ const EFriContribute = () => {
               </div>
 
               <div className="space-y-1.5">
-                <label className="font-inter text-xs font-bold text-muted-foreground uppercase tracking-wider">Filière concernée</label>
+                <label className="font-inter text-xs font-bold text-muted-foreground uppercase tracking-wider">
+                  Filière concernée
+                </label>
                 <select
                   value={form.filiere}
                   onChange={e => update("filiere", e.target.value)}
@@ -212,7 +260,9 @@ const EFriContribute = () => {
               </div>
 
               <div className="space-y-1.5">
-                <label className="font-inter text-xs font-bold text-muted-foreground uppercase tracking-wider">Promotion</label>
+                <label className="font-inter text-xs font-bold text-muted-foreground uppercase tracking-wider">
+                  Promotion
+                </label>
                 <select
                   value={form.promotion}
                   onChange={e => update("promotion", e.target.value)}
@@ -221,6 +271,32 @@ const EFriContribute = () => {
                   <option value="">Sélectionner</option>
                   {promotions.map(p => <option key={p} value={p}>{p}</option>)}
                 </select>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="font-inter text-xs font-bold text-muted-foreground uppercase tracking-wider">
+                  Semestre
+                </label>
+                <select
+                  value={form.semestre}
+                  onChange={e => update("semestre", e.target.value)}
+                  className="w-full px-4 py-3 rounded-xl border border-border bg-muted/30 font-inter text-sm focus:border-primary outline-none transition-all cursor-pointer"
+                >
+                  {semestres.map(s => <option key={s} value={s}>{s}</option>)}
+                </select>
+              </div>
+
+              <div className="space-y-1.5 col-span-1 md:col-span-2">
+                <label className="font-inter text-xs font-bold text-muted-foreground uppercase tracking-wider">
+                  Description (Optionnel)
+                </label>
+                <textarea
+                  value={form.description}
+                  onChange={e => update("description", e.target.value)}
+                  placeholder="Informations complémentaires sur le document..."
+                  rows={3}
+                  className="w-full px-4 py-3 rounded-xl border border-border bg-muted/30 font-inter text-sm focus:border-primary focus:ring-4 focus:ring-primary/5 outline-none transition-all resize-none"
+                />
               </div>
             </div>
           )}
@@ -236,25 +312,30 @@ const EFriContribute = () => {
                 onDrop={handleDrop}
                 onDragOver={e => e.preventDefault()}
                 onClick={() => document.getElementById("file-input")?.click()}
-                className={`w-full max-w-xl aspect-video border-2 border-dashed rounded-3xl p-8 flex flex-col items-center justify-center transition-all duration-300 group cursor-pointer ${file ? "border-primary bg-primary/5" : "border-border hover:border-primary hover:bg-muted/50"
-                  }`}
+                className={`w-full max-w-xl aspect-video border-2 border-dashed rounded-3xl p-8 flex flex-col items-center justify-center transition-all duration-300 group cursor-pointer ${
+                  file ? "border-primary bg-primary/5" : "border-border hover:border-primary hover:bg-muted/50"
+                }`}
               >
                 {file ? (
                   <div className="text-center animate-in bounce-in duration-500">
                     <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
                       <FileText size={40} className="text-primary" />
                     </div>
-                    <p className="font-poppins font-bold text-foreground truncate max-w-[200px]">{file.name}</p>
-                    <p className="font-inter text-xs text-muted-foreground">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
+                    <p className="font-poppins font-bold text-foreground truncate max-w-[300px] mb-1">
+                      {file.name}
+                    </p>
+                    <p className="font-inter text-xs text-muted-foreground mb-4">
+                      {(file.size / 1024 / 1024).toFixed(2)} MB
+                    </p>
                     <button
-                      onClick={() => setFile(null)}
-                      className="mt-6 flex items-center gap-2 mx-auto px-4 py-2 rounded-lg bg-destructive/10 text-destructive font-inter text-xs font-bold hover:bg-destructive hover:text-white transition-all shadow-sm"
+                      onClick={(e) => { e.stopPropagation(); setFile(null); }}
+                      className="flex items-center gap-2 mx-auto px-4 py-2 rounded-lg bg-destructive/10 text-destructive font-inter text-xs font-bold hover:bg-destructive hover:text-white transition-all shadow-sm"
                     >
                       <X size={14} /> Supprimer
                     </button>
                   </div>
                 ) : (
-                  <div className="text-center pointer-events-none" onClick={() => document.getElementById("file-input")?.click()}>
+                  <div className="text-center pointer-events-none">
                     <div className="w-20 h-20 rounded-2xl bg-muted flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
                       <FileUp size={40} className="text-muted-foreground group-hover:text-primary transition-colors" />
                     </div>
@@ -267,7 +348,13 @@ const EFriContribute = () => {
                     </div>
                   </div>
                 )}
-                <input id="file-input" type="file" className="hidden" onChange={handleFileInput} accept=".pdf,.docx,.zip" />
+                <input 
+                  id="file-input" 
+                  type="file" 
+                  className="hidden" 
+                  onChange={handleFileInput} 
+                  accept=".pdf,.docx,.doc,.zip" 
+                />
               </div>
             </div>
           )}
@@ -276,7 +363,7 @@ const EFriContribute = () => {
             <div className="space-y-8 animate-in slide-in-from-bottom-4 duration-500">
               <div className="text-center space-y-2">
                 <h3 className="font-poppins font-semibold text-lg">Confirmation finale</h3>
-                <p className="font-inter text-xs text-muted-foreground">Vérifiez les informations avant l'envoi immédiat</p>
+                <p className="font-inter text-xs text-muted-foreground">Vérifiez les informations avant l'envoi</p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -284,7 +371,7 @@ const EFriContribute = () => {
                   <div className="w-10 h-10 rounded-xl bg-background border border-border flex items-center justify-center text-primary flex-shrink-0">
                     <FileText size={18} />
                   </div>
-                  <div>
+                  <div className="flex-1 min-w-0">
                     <label className="text-[10px] font-bold text-muted-foreground uppercase">Document</label>
                     <p className="font-poppins font-semibold text-sm line-clamp-1">{form.titre}</p>
                     <p className="font-inter text-[11px] text-muted-foreground">{form.type} · {file?.name}</p>
@@ -295,10 +382,12 @@ const EFriContribute = () => {
                   <div className="w-10 h-10 rounded-xl bg-background border border-border flex items-center justify-center text-secondary flex-shrink-0">
                     <ChevronRight size={18} />
                   </div>
-                  <div>
+                  <div className="flex-1 min-w-0">
                     <label className="text-[10px] font-bold text-muted-foreground uppercase">Destination</label>
                     <p className="font-poppins font-semibold text-sm line-clamp-1">{form.matiere}</p>
-                    <p className="font-inter text-[11px] text-muted-foreground">{form.filiere} · {form.promotion}</p>
+                    <p className="font-inter text-[11px] text-muted-foreground">
+                      {form.filiere} · {form.promotion} · {form.semestre}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -306,11 +395,16 @@ const EFriContribute = () => {
               {uploading && (
                 <div className="space-y-3 pt-4">
                   <div className="flex justify-between items-end">
-                    <p className="font-inter text-xs font-bold text-primary animate-pulse">Transmission en cours...</p>
+                    <p className="font-inter text-xs font-bold text-primary animate-pulse">
+                      Transmission en cours...
+                    </p>
                     <p className="font-inter text-xs font-bold text-muted-foreground">{progress}%</p>
                   </div>
                   <div className="h-3 bg-muted rounded-full overflow-hidden p-0.5 border border-border shadow-inner">
-                    <div className="h-full bg-primary rounded-full transition-all duration-300 shadow-sm" style={{ width: `${progress}%` }} />
+                    <div 
+                      className="h-full bg-primary rounded-full transition-all duration-300 shadow-sm" 
+                      style={{ width: `${progress}%` }} 
+                    />
                   </div>
                 </div>
               )}
@@ -340,7 +434,8 @@ const EFriContribute = () => {
             ) : (
               <button
                 onClick={handleSubmit}
-                className="flex items-center gap-2 px-8 py-3 rounded-xl bg-primary text-primary-foreground font-inter text-sm font-bold shadow-lg shadow-primary/20 hover:opacity-90 transition-all"
+                disabled={!file}
+                className="flex items-center gap-2 px-8 py-3 rounded-xl bg-primary text-primary-foreground font-inter text-sm font-bold shadow-lg shadow-primary/20 hover:opacity-90 transition-all disabled:opacity-50"
               >
                 <Upload size={18} /> Lancer le téléversement
               </button>

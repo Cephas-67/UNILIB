@@ -47,11 +47,64 @@ export const registeredUsers = [
   }
 ];
 
-export const resources = [];
+export const mockResources = [
+  {
+    id: "1",
+    titre: "Cours - Introduction à React",
+    type: "Cours",
+    filiere: "Genie Logiciel",
+    niveau: "L3",
+    semestre: "S2",
+    auteur: "Prof. DOSSOU",
+    date: "2026-02-01",
+    url: "/files/cours-react.pdf",
+    telechargements: 45,
+  },
+  {
+    id: "2",
+    titre: "TD - Algorithmes de tri",
+    type: "TD",
+    filiere: "Genie Logiciel",
+    niveau: "L2",
+    semestre: "S1",
+    auteur: "Dr. AGBANGLA",
+    date: "2026-01-15",
+    url: "/files/td-algo.pdf",
+    telechargements: 120,
+  },
+];
 
-export const projets = [];
+export const mockProjets = [
+  {
+    id: "1",
+    titre: "Plateforme de gestion de bibliothèque",
+    description: "Système de gestion de ressources académiques",
+    filiere: "Genie Logiciel",
+    niveau: "L3",
+    membres: ["Marcel AHOUANDJINOU", "Jean ADJOVI"],
+    status: "En cours",
+    date: "2026-02-01",
+  },
+];
 
-export const emploiDuTemps = [];
+export const mockEmploiDuTemps = [
+  {
+    id: "1",
+    jour: "Lundi",
+    heure: "08:00 - 10:00",
+    matiere: "Programmation Web",
+    salle: "Amphi A",
+    professeur: "Dr. SANNI",
+  },
+  {
+    id: "2",
+    jour: "Lundi",
+    heure: "10:00 - 12:00",
+    matiere: "Base de données",
+    salle: "Lab 2",
+    professeur: "Prof. MENSAH",
+  },
+];
 
 export const actualites = [
   { id: "1", titre: "Nouveaux sujets d'examen disponibles", description: "Les sujets d'examen du semestre S1 2025-2026 sont maintenant disponibles pour toutes les filières.", date: "2026-02-15", type: "ressource" },
@@ -74,3 +127,8 @@ export const contributionsEnAttente = [
   { id: "4", titre: "TP - Développement Web", contributeur: "Aïcha SANNI", date: "2026-02-11", type: "TP", filiere: "Genie Logiciel" },
   { id: "5", titre: "Correction - Algèbre", contributeur: "Koffi MENSAH", date: "2026-02-10", type: "Correction", filiere: "SEIoT" },
 ];
+
+// Remplacer exports vides
+export const resources = mockResources;
+export const projets = mockProjets;
+export const emploiDuTemps = mockEmploiDuTemps;

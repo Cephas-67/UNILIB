@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from .models import User
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from django.contrib.auth import authenticate
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -8,7 +10,7 @@ class UserSerializer(serializers.ModelSerializer):
         read_only_fields = ['id']
 
 class RegisterSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True)
+    password = serializers.CharField(write_only=True, min_length=8)
 
     class Meta:
         model = User
@@ -26,3 +28,49 @@ class RegisterSerializer(serializers.ModelSerializer):
             semestre=validated_data.get('semestre', '')
         )
         return user
+
+class EmailTokenObtainPairSerializer(TokenObtainPairSerializer):
+    # Redéfinir les champs pour accepter email au lieu de username
+    email = serializers.EmailField(required=True)
+    password = serializers.CharField(required=True, write_only=True)
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Supprimer le champ username
+        if 'username' in self.fields:
+            del self.fields['username']
+    
+    def validate(self, attrs):
+        email = attrs.get('email')
+        password = attrs.get('password')
+        
+        print(f"🔐 Login attempt: {email}")
+        
+        # Chercher l'utilisateur par email
+        try:
+            user = User.objects.get(email=email)
+            print(f"✅ User found: {user.username}")
+        except User.DoesNotExist:
+            print(f"❌ No user with email: {email}")
+            raise serializers.ValidationError('Aucun compte actif n\'a été trouvé avec les identifiants fournis')
+        
+        # Vérifier le mot de passe
+        if not user.check_password(password):
+            print(f"❌ Wrong password for: {email}")
+            raise serializers.ValidationError('Aucun compte actif n\'a été trouvé avec les identifiants fournis')
+        
+        # Vérifier que le compte est actif
+        if not user.is_active:
+            print(f"❌ Inactive user: {email}")
+            raise serializers.ValidationError('Ce compte est désactivé')
+        
+        print(f"✅ Authentication successful for: {email}")
+        
+        # Générer les tokens en passant le username au parent
+        # Le parent attend 'username' et 'password'
+        refresh = self.get_token(user)
+        
+        return {
+            'refresh': str(refresh),
+            'access': str(refresh.access_token),
+        }

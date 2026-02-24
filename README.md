@@ -192,3 +192,69 @@ Ces comptes sont pré-enregistrés dans `src/data/mockData.ts` et fonctionnent i
 - **Types de ressources :** Cours · TD · TP · Examen · Correction · Projet
 
 _Développé dans le cadre du Hackathon IFRI 2026 · © IFRI-UAC · Tous droits réservés_
+
+## Intégration Backend & Déploiement
+
+Cette section explique comment relier le frontend au backend (localement et en production) et quelles variables d'environnement définir.
+
+- Frontend env (fichier `.env` à la racine du projet ou variables CI/CD) :
+
+```
+VITE_API_BASE_URL=https://api.mondomaine.tld/api   # URL publique du backend (terminée par /api)
+VITE_USE_MOCK_DATA=false                           # false pour utiliser l'API réelle
+```
+
+- Backend env (Django) :
+
+```
+SECRET_KEY=...                                    # clé secrète
+DEBUG=False
+ALLOWED_HOSTS=your-domain.com
+DATABASE_URL=postgres://user:pass@host:5432/dbname
+CORS_ALLOWED_ORIGINS=https://app.mondomaine.tld
+```
+
+Commands locales (développement)
+
+1) Démarrer le backend Django (depuis `unilib_backend`)
+
+```bash
+python -m venv .venv
+source .venv/Scripts/activate  # Windows PowerShell: .venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+python manage.py migrate
+python manage.py runserver 0.0.0.0:8000
+```
+
+2) Démarrer le frontend (depuis la racine `UNILIB`)
+
+```bash
+# si vous voulez pointer explicitement vers le backend local
+export VITE_API_BASE_URL=http://localhost:8000/api
+export VITE_USE_MOCK_DATA=false
+npm install
+npm run dev
+```
+
+Tests rapides à effectuer après connexion :
+- POST `/api/auth/login/` → retourne `access` + `refresh` (le frontend envoie `username` = email)
+- GET `/api/auth/me/` avec header `Authorization: Bearer <access>` → retourne l'utilisateur
+- GET `/api/resources/` et POST `/api/resources/` (multipart/form-data) pour upload
+
+Notes de déploiement
+- Option 1 (séparer frontend / backend) :
+	- Déployer le frontend (Vite) sur Vercel / Netlify. Définir `VITE_API_BASE_URL` en production.
+	- Déployer le backend Django sur Render / Railway / DigitalOcean App / Heroku + config DB.
+
+- Option 2 (servir le build frontend via Django)
+	- `npm run build` → copie le dossier `dist` dans `unilib_backend/staticfiles` ou configure le serveur pour servir `dist`.
+	- Exécuter `python manage.py collectstatic` puis servir via Gunicorn + Nginx, ou utiliser `whitenoise` (déjà configuré).
+
+Conseils de sécurité pour la production
+- Désactiver `CORS_ALLOW_ALL_ORIGINS` et définir `CORS_ALLOWED_ORIGINS`.
+- Mettre `DEBUG=False` et définir `ALLOWED_HOSTS`.
+- Utiliser HTTPS (certificats TLS) et des tokens JWT avec durées raisonnables.
+
+Si vous voulez, je peux :
+- exécuter quelques tests d'API locaux (login / getCurrentUser) si vous voulez lancer les serveurs, ou
+- préparer des fichiers `.env.example` et un guide de déploiement plus détaillé pour une cible (Vercel + Render / Docker). 

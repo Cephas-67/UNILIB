@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { login, getCurrentUser } from "@/lib/api";
 import { registeredUsers } from "@/data/mockData";
 import UniLibLogo from "@/components/UniLibLogo";
 
@@ -38,49 +39,87 @@ const EFriLogin = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
+    
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 1500));
 
-    const storedUsers = JSON.parse(localStorage.getItem("unilib_users") || "[]");
-    const allUsers = [...registeredUsers, ...storedUsers];
-    const user = allUsers.find(u => u.email === email.toLowerCase() && u.password === password);
-
-    setLoading(false);
-
-    if (user) {
-      if (user.status && user.status !== "active") {
+    try {
+      // 1. Login API et récupération des tokens
+      console.log('🔐 Tentative de connexion...', email);
+      const loginData = await login(email.toLowerCase(), password);
+      console.log('✅ Login réussi, tokens stockés');
+      
+      // 2. Récupérer les infos utilisateur
+      console.log('👤 Récupération des infos utilisateur...');
+      const userData = await getCurrentUser();
+      console.log('✅ User data:', userData);
+      
+      // 3. Vérifier le statut
+      if (userData.status && userData.status !== "active") {
         toast({
           title: "Accès refusé",
-          description: user.status === "banned" ? "Votre compte a été banni par l'administration." : "Votre compte est actuellement désactivé.",
+          description: userData.status === "banned" 
+            ? "Votre compte a été banni par l'administration." 
+            : "Votre compte est actuellement désactivé.",
           variant: "destructive"
         });
+        setLoading(false);
         return;
       }
-      localStorage.setItem("unilib_session", JSON.stringify(user));
-      toast({ title: "Connexion réussie", description: `Ravi de vous revoir, ${user.prenom} !` });
+
+      // 4. Stocker la session
+      localStorage.setItem("unilib_session", JSON.stringify(userData));
+      console.log('✅ Session stockée');
+      
+      toast({ 
+        title: "Connexion réussie", 
+        description: `Ravi de vous revoir, ${userData.prenom} !` 
+      });
+      
       navigate("/e-fri/dashboard");
-    } else {
+      
+    } catch (error: any) {
+      console.error('❌ Login error:', error);
       toast({
         title: "Erreur de connexion",
-        description: "Email ou mot de passe incorrect.",
+        description: error.message || "Email ou mot de passe incorrect.",
         variant: "destructive"
       });
       setErrors({ email: "Identifiants invalides" });
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleGoogleLogin = () => {
-    toast({
-      title: "Connexion Google",
-      description: "Simulation de l'authentification Google en cours...",
+  const handleGoogleLogin = async () => {
+  toast({
+    title: "Connexion Google",
+    description: "Simulation de l'authentification Google...",
+  });
+  
+  try {
+    // Utiliser un compte de test prédéfini
+    const testEmail = "test@ifri.edu";
+    const testPassword = "test1234"; // Créez ce compte en base d'abord !
+    
+    const data = await login(testEmail, testPassword);
+    const userData = await getCurrentUser();
+    
+    localStorage.setItem("unilib_session", JSON.stringify(userData));
+    
+    toast({ 
+      title: "Connecté via Google", 
+      description: `Bienvenue, ${userData.prenom} !` 
     });
-    setTimeout(() => {
-      const user = registeredUsers[0]; // Marcel
-      localStorage.setItem("unilib_session", JSON.stringify(user));
-      navigate("/e-fri/dashboard");
-      toast({ title: "Connecté via Google", description: `Bienvenue, ${user.prenom} !` });
-    }, 1000);
-  };
+    
+    navigate("/e-fri/dashboard");
+  } catch (error) {
+    toast({
+      title: "Erreur",
+      description: "La connexion Google a échoué",
+      variant: "destructive"
+    });
+  }
+};
 
   return (
     <div className="min-h-screen flex">
@@ -136,7 +175,9 @@ const EFriLogin = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="votre@email.com"
-                  className={`w-full pl-10 pr-4 py-3 rounded-lg border font-inter text-sm text-foreground bg-background outline-none transition-colors ${errors.email ? "border-destructive border-2" : "border-input focus:border-secondary focus:border-2"}`}
+                  className={`w-full pl-10 pr-4 py-3 rounded-lg border font-inter text-sm text-foreground bg-background outline-none transition-colors ${
+                    errors.email ? "border-destructive border-2" : "border-input focus:border-secondary focus:border-2"
+                  }`}
                 />
               </div>
               {errors.email && <p className="font-inter text-xs text-destructive mt-1">{errors.email}</p>}
@@ -151,9 +192,15 @@ const EFriLogin = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className={`w-full pl-10 pr-12 py-3 rounded-lg border font-inter text-sm text-foreground bg-background outline-none transition-colors ${errors.password ? "border-destructive border-2" : "border-input focus:border-secondary focus:border-2"}`}
+                  className={`w-full pl-10 pr-12 py-3 rounded-lg border font-inter text-sm text-foreground bg-background outline-none transition-colors ${
+                    errors.password ? "border-destructive border-2" : "border-input focus:border-secondary focus:border-2"
+                  }`}
                 />
-                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+                <button 
+                  type="button" 
+                  onClick={() => setShowPassword(!showPassword)} 
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
@@ -162,10 +209,17 @@ const EFriLogin = () => {
 
             <div className="flex items-center justify-between">
               <label className="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)} className="w-4 h-4 rounded border-input accent-primary" />
+                <input 
+                  type="checkbox" 
+                  checked={remember} 
+                  onChange={(e) => setRemember(e.target.checked)} 
+                  className="w-4 h-4 rounded border-input accent-primary" 
+                />
                 <span className="font-inter text-sm text-foreground">Se souvenir de moi</span>
               </label>
-              <Link to="/e-fri/mot-de-passe-oublie" className="font-inter text-sm text-secondary hover:underline">Mot de passe oublié ?</Link>
+              <Link to="/e-fri/mot-de-passe-oublie" className="font-inter text-sm text-secondary hover:underline">
+                Mot de passe oublié ?
+              </Link>
             </div>
 
             <button
@@ -173,7 +227,12 @@ const EFriLogin = () => {
               disabled={loading}
               className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-inter text-sm font-medium hover:bg-primary-hover transition-colors disabled:opacity-70 flex items-center justify-center gap-2"
             >
-              {loading ? "Connexion..." : "Se connecter"}
+              {loading ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  Connexion...
+                </>
+              ) : "Se connecter"}
             </button>
 
             <button

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { DataService } from "@/lib/dataService";
 
 export interface User {
     id?: string;
@@ -30,13 +31,25 @@ export const useSession = () => {
         setLoading(false);
     }, []);
 
-    const login = (userData: User) => {
-        localStorage.setItem("unilib_session", JSON.stringify(userData));
-        setUser(userData);
+    const login = async (email: string, password: string) => {
+        try {
+            const response = await DataService.login(email, password);
+            const userData = response.user;
+            
+            localStorage.setItem("unilib_session", JSON.stringify(userData));
+            setUser(userData);
+            
+            return userData;
+        } catch (error) {
+            console.error("Login error:", error);
+            throw error;
+        }
     };
 
     const logout = () => {
         localStorage.removeItem("unilib_session");
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("refresh_token");
         setUser(null);
     };
 
