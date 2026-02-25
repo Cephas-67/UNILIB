@@ -7,7 +7,7 @@ from .models import User
 from django.contrib.auth import authenticate
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
-from resources.models import Resource
+from resources.models import Resource, CoursPratique
 
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
@@ -83,22 +83,19 @@ class EmailTokenObtainPairView(APIView):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_dashboard_stats(request):
-    """Récupérer les statistiques pour le dashboard"""
     user = request.user
     
-    # Total des ressources dans la base
     total_resources = Resource.objects.count()
     
-    # Ressources ajoutées cette semaine
     from datetime import datetime, timedelta
     seven_days_ago = datetime.now() - timedelta(days=7)
     recent_resources = Resource.objects.filter(created_at__gte=seven_days_ago).count()
     
-    # Ressources uploadées par l'utilisateur (si admin/responsable)
     user_uploads = Resource.objects.filter(uploaded_by=user).count() if user.role in ['admin', 'responsable'] else 0
     
-    # Stats utilisateur (vous pouvez ajouter un modèle Download pour tracker)
-    # Pour l'instant, on retourne 0
+    # Compter les cours pratiques
+    cours_count = CoursPratique.objects.count()
+    
     downloads_count = 0
     
     return Response({
@@ -106,5 +103,5 @@ def get_dashboard_stats(request):
         'recent_resources': recent_resources,
         'user_uploads': user_uploads,
         'downloads_count': downloads_count,
-        'cours_count': 0,  # À implémenter si vous avez un modèle Cours
+        'cours_count': cours_count,  # ← AJOUTÉ
     })

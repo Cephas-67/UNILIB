@@ -47,3 +47,54 @@ class Resource(models.Model):
     
     def __str__(self):
         return f"{self.titre} ({self.matiere})"
+    
+class CoursPratique(models.Model):
+    DIFFICULTE_CHOICES = [
+        ('debutant', 'Débutant'),
+        ('intermediaire', 'Intermédiaire'),
+        ('avance', 'Avancé'),
+    ]
+    
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    titre = models.CharField(max_length=255)
+    description = models.TextField()
+    difficulte = models.CharField(max_length=20, choices=DIFFICULTE_CHOICES, default='debutant')
+    stack = models.JSONField(default=list)  # Liste de technologies
+    apis = models.JSONField(default=list)   # Liste d'APIs/modules
+    etapes = models.JSONField(default=list) # Liste des étapes
+    liens = models.JSONField(default=list)  # Liste de {label, url}
+    fichier_zip = models.FileField(upload_to='cours/%Y/%m/', blank=True, null=True)
+    uploaded_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='cours_pratiques')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        db_table = 'cours_pratiques'
+        ordering = ['-created_at']
+        verbose_name_plural = 'Cours Pratiques'
+    
+    def __str__(self):
+        return self.titre
+
+
+class EmploiDuTemps(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    titre = models.CharField(max_length=255, default='Emploi du temps officiel')
+    fichier_pdf = models.FileField(upload_to='emploi_temps/')
+    uploaded_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='emplois_temps')
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_active = models.BooleanField(default=True)  # Un seul actif à la fois
+    
+    class Meta:
+        db_table = 'emploi_temps'
+        ordering = ['-created_at']
+        verbose_name_plural = 'Emplois du Temps'
+    
+    def __str__(self):
+        return f"{self.titre} - {self.created_at.strftime('%d/%m/%Y')}"
+    
+    def save(self, *args, **kwargs):
+        # Désactiver tous les autres emplois du temps si celui-ci est actif
+        if self.is_active:
+            EmploiDuTemps.objects.filter(is_active=True).update(is_active=False)
+        super().save(*args, **kwargs)
