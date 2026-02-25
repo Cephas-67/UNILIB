@@ -1,8 +1,16 @@
 from django.db import models
+
 from authentication.models import User
 import uuid
+import os
 
-# AUCUN IMPORT CLOUDINARY ICI !
+# Choix du storage dynamique
+if os.environ.get('DATABASE_URL') and os.environ.get('CLOUDINARY_CLOUD_NAME'):
+    from cloudinary_storage.storage import MediaCloudinaryStorage
+    fichier_storage = MediaCloudinaryStorage()
+else:
+    from django.core.files.storage import FileSystemStorage
+    fichier_storage = FileSystemStorage()
 
 class Resource(models.Model):
     TYPE_CHOICES = [
@@ -39,7 +47,7 @@ class Resource(models.Model):
     filiere = models.CharField(max_length=50, choices=FILIERE_CHOICES)
     promotion = models.CharField(max_length=10, choices=PROMOTION_CHOICES)
     semestre = models.IntegerField()
-    fichier = models.FileField(upload_to='resources/%Y/%m/')
+    fichier = models.FileField(upload_to='resources/%Y/%m/', storage=fichier_storage)
     uploaded_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='resources')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -67,7 +75,7 @@ class CoursPratique(models.Model):
     apis = models.JSONField(default=list)   # Liste d'APIs/modules
     etapes = models.JSONField(default=list) # Liste des étapes
     liens = models.JSONField(default=list)  # Liste de {label, url}
-    fichier_zip = models.FileField(upload_to='cours/%Y/%m/', blank=True, null=True)
+    fichier_zip = models.FileField(upload_to='cours/%Y/%m/', storage=fichier_storage, blank=True, null=True)
     uploaded_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='cours_pratiques')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -84,7 +92,7 @@ class CoursPratique(models.Model):
 class EmploiDuTemps(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     titre = models.CharField(max_length=255, default='Emploi du temps officiel')
-    fichier_pdf = models.FileField(upload_to='emploi_temps/')
+    fichier_pdf = models.FileField(upload_to='emploi_temps/', storage=fichier_storage)
     uploaded_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='emplois_temps')
     created_at = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)  # Un seul actif à la fois

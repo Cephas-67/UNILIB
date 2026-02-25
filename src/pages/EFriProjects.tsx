@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FolderArchive, Cpu, Zap, Link as LinkIcon, Download, Info, ArrowRight, Plus, X, Trash2 } from "lucide-react";
-import { projets as initialProjets } from "@/data/mockData";
+import { getCoursPratiques, uploadCoursPratique } from "@/lib/api";
 import { useSession } from "@/hooks/use-session";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -24,11 +24,23 @@ const EFriProjects = () => {
   const { toast } = useToast();
   const [filter, setFilter] = useState("Tous");
   const [selectedProject, setSelectedProject] = useState<any>(null);
-  const [cours, setCours] = useState(() => {
-    const stored = localStorage.getItem("unilib_cours");
-    if (stored) return JSON.parse(stored);
-    return initialProjets; // Keep base courses for first load
-  });
+  const [cours, setCours] = useState([]);
+  const [loading, setLoading] = useState(true);
+    // Charger les cours pratiques depuis l’API
+    useEffect(() => {
+      async function fetchCours() {
+        setLoading(true);
+        try {
+          const data = await getCoursPratiques();
+          setCours(data);
+        } catch (err) {
+          toast({ title: "Erreur", description: "Impossible de charger les cours pratiques.", variant: "destructive" });
+        } finally {
+          setLoading(false);
+        }
+      }
+      fetchCours();
+    }, []);
   const [isAdding, setIsAdding] = useState(false);
 
   // Form state for new course
@@ -94,7 +106,7 @@ const EFriProjects = () => {
     localStorage.setItem(key, (count + 1).toString());
   };
 
-  const handleAddCours = () => {
+  const handleAddCours = async () => {
     if (!newCours.titre || !newCours.description) {
       toast({
         title: "Champs manquants",
@@ -104,52 +116,43 @@ const EFriProjects = () => {
       return;
     }
 
-    // Convert file to Data URL if present
-    const addNotification = (title: string, description: string) => {
-      const stored = JSON.parse(localStorage.getItem("unilib_notifications") || "[]");
-      const newNotif = {
-        id: Date.now(),
-        title,
-        description,
-        time: "À l'instant",
-        type: "info"
-      };
-      localStorage.setItem("unilib_notifications", JSON.stringify([newNotif, ...stored]));
+    const formData = new FormData();
+    formData.append("titre", newCours.titre);
+    formData.append("description", newCours.description);
+    
+    // CORRECTION : Mapping de la difficulté pour correspondre aux choix du modèle Django
+    // Backend attend : 'debutant', 'intermediaire', 'avance'
+    const diffMap: Record<string, string> = {
+      "Débutant": "debutant",
+      "Intermédiaire": "intermediaire",
+      "Avancé": "avance"
     };
+    formData.append("difficulte", diffMap[newCours.difficulte] || "debutant");
 
-    const saveCours = (fileUrl: string) => {
-      const validLinks = newCours.liens.filter(l => l.url !== "");
+    // Send all JSON fields as stringified JSON
+    formData.append("stack", JSON.stringify(asArray(newCours.stack)));
+    formData.append("apis", JSON.stringify(asArray(newCours.apis)));
+    formData.append("etapes", JSON.stringify(["Consulter le support de cours PDF", "Réaliser les exercices pratiques"]));
+    formData.append("liens", JSON.stringify(newCours.liens.filter(l => l.url !== "")));
+    if (selectedFile) formData.append("fichier_zip", selectedFile);
 
-      const coursToAdd = {
-        ...newCours,
-        id: (cours.length + 1).toString(),
-        difficulte: newCours.difficulte as "Débutant" | "Intermédiaire" | "Avancé",
-        stack: newCours.stack.split(",").map(s => s.trim()),
-        apis: newCours.apis.split(",").map(s => s.trim()),
-        etapes: ["Consulter le support de cours PDF", "Réaliser les exercices pratiques"],
-        liens: validLinks,
-        image: "",
-        zipUrl: fileUrl || "#"
-      };
-
-      const updatedCours = [coursToAdd, ...cours];
-      setCours(updatedCours);
-      localStorage.setItem("unilib_cours", JSON.stringify(updatedCours));
-
-      addNotification("Nouveau cours disponible", `Le cours « ${coursToAdd.titre} » a été publié.`);
-
+    try {
+      const added = await uploadCoursPratique(formData);
+      setCours([added, ...cours]);
       toast({ title: "Cours ajouté", description: "Le nouveau cours pratique a été publié avec succès." });
       setNewCours({ titre: "", description: "", difficulte: "Débutant", stack: "", apis: "", zipUrl: "", liens: [{ label: "", url: "" }] });
       setSelectedFile(null);
-      setIsAdding(false); // Close the dialog after saving
-    };
-
-    if (selectedFile) {
-      const reader = new FileReader();
-      reader.onloadend = () => saveCours(reader.result as string);
-      reader.readAsDataURL(selectedFile);
-    } else {
-      saveCours("#");
+      setIsAdding(false);
+    } catch (err: any) {
+      toast({ title: "Erreur", description: "Échec de l’ajout du cours pratique.", variant: "destructive" });
+      // Log backend error response for debugging
+      if (err?.response) {
+        console.error("Backend error:", err.response.data);
+        toast({ title: "Upload failed", description: `Backend error: ${JSON.stringify(err.response.data)}` });
+      } else {
+        console.error("Upload error:", err);
+        toast({ title: "Upload failed", description: "An error occurred while uploading." });
+      }
     }
   };
 

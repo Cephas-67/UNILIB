@@ -1,3 +1,26 @@
+// COURS PRATIQUES
+export const getCoursPratiques = async () => {
+  const token = localStorage.getItem('access_token');
+  const response = await fetch(`${API_URL}/cours-pratiques/`, {
+    headers: {
+      'Authorization': token ? `Bearer ${token}` : '',
+    },
+  });
+  return handleResponse(response);
+};
+
+export const uploadCoursPratique = async (formData: FormData) => {
+  const token = localStorage.getItem('access_token');
+  const response = await fetch(`${API_URL}/cours-pratiques/`, {
+    method: 'POST',
+    headers: {
+      'Authorization': token ? `Bearer ${token}` : '',
+      // NE PAS mettre Content-Type pour FormData
+    },
+    body: formData,
+  });
+  return handleResponse(response);
+};
 import { AppConfig } from '../config/appConfig';
 
 const API_URL = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || AppConfig.API_BASE_URL || 'http://127.0.0.1:8000/api';
