@@ -1,7 +1,8 @@
 from django.db import models
 from authentication.models import User
 import uuid
-from cloudinary_storage.storage import MediaCloudinaryStorage
+
+# AUCUN IMPORT CLOUDINARY ICI !
 
 class Resource(models.Model):
     TYPE_CHOICES = [
@@ -23,20 +24,22 @@ class Resource(models.Model):
     ]
     
     PROMOTION_CHOICES = [
-        ('l1', 'Licence 1'),
-        ('l2', 'Licence 2'),
-        ('l3', 'Licence 3'),
+        ('l1', 'L1'),
+        ('l2', 'L2'),
+        ('l3', 'L3'),
+        ('m1', 'M1'),
+        ('m2', 'M2'),
     ]
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     titre = models.CharField(max_length=255)
     matiere = models.CharField(max_length=100)
-    description = models.TextField(blank=True, null=True)
+    description = models.TextField(blank=True, default='')
     type_ressource = models.CharField(max_length=20, choices=TYPE_CHOICES)
     filiere = models.CharField(max_length=50, choices=FILIERE_CHOICES)
     promotion = models.CharField(max_length=10, choices=PROMOTION_CHOICES)
     semestre = models.IntegerField()
-    fichier = models.FileField(upload_to='resources/%Y/%m/', storage=MediaCloudinaryStorage())
+    fichier = models.FileField(upload_to='resources/%Y/%m/')
     uploaded_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='resources')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -47,7 +50,8 @@ class Resource(models.Model):
     
     def __str__(self):
         return f"{self.titre} ({self.matiere})"
-    
+
+
 class CoursPratique(models.Model):
     DIFFICULTE_CHOICES = [
         ('debutant', 'Débutant'),
@@ -98,3 +102,6 @@ class EmploiDuTemps(models.Model):
         if self.is_active:
             EmploiDuTemps.objects.filter(is_active=True).update(is_active=False)
         super().save(*args, **kwargs)
+    
+    
+    
