@@ -19,8 +19,83 @@ const diffColors = {
   "Avancé": "bg-[#FFEBEE] text-destructive"
 };
 
+// 🎨 DONNÉES DE DÉMONSTRATION (MAQUETTE)
+const DEMO_COURS = [
+  {
+    id: "demo-1",
+    titre: "Développement Mobile avec React Native",
+    description: "Apprenez à créer des applications mobiles multiplateformes avec React Native et Expo. Ce cours couvre les fondamentaux du développement mobile, la navigation, la gestion d'état et l'intégration d'APIs.",
+    difficulte: "Intermédiaire",
+    stack: ["React Native", "Expo", "TypeScript", "Redux Toolkit"],
+    apis: ["AsyncStorage", "React Navigation", "Expo Location", "Firebase Auth"],
+    etapes: [
+      "Installer et configurer l'environnement de développement",
+      "Créer votre première application mobile",
+      "Implémenter la navigation entre écrans",
+      "Gérer l'état global avec Redux",
+      "Intégrer des APIs externes",
+      "Déployer sur iOS et Android"
+    ],
+    liens: [
+      { label: "Documentation React Native", url: "https://reactnative.dev" },
+      { label: "Expo Documentation", url: "https://docs.expo.dev" },
+      { label: "Tutoriel vidéo complet", url: "https://youtube.com/react-native" }
+    ],
+    fichier_zip_url: "https://cdn.example.com/cours/react-native-pack.zip",
+    uploaded_by_name: "Prof. DOSSOU Marcel",
+    created_at: "2026-02-20T10:00:00Z"
+  },
+  {
+    id: "demo-2",
+    titre: "Intelligence Artificielle - Machine Learning avec Python",
+    description: "Découvrez les concepts fondamentaux du Machine Learning et apprenez à construire vos premiers modèles prédictifs avec Python, scikit-learn et TensorFlow.",
+    difficulte: "Avancé",
+    stack: ["Python", "TensorFlow", "Scikit-learn", "Pandas", "NumPy"],
+    apis: ["Keras", "Matplotlib", "Jupyter Notebook"],
+    etapes: [
+      "Comprendre les bases du Machine Learning",
+      "Prétraiter et nettoyer les données",
+      "Créer un modèle de régression linéaire",
+      "Implémenter un réseau de neurones",
+      "Évaluer et optimiser les performances",
+      "Déployer le modèle en production"
+    ],
+    liens: [
+      { label: "TensorFlow Documentation", url: "https://tensorflow.org" },
+      { label: "Kaggle Datasets", url: "https://kaggle.com/datasets" },
+      { label: "Machine Learning Crash Course", url: "https://developers.google.com/machine-learning" }
+    ],
+    fichier_zip_url: "https://cdn.example.com/cours/ml-python-pack.zip",
+    uploaded_by_name: "Dr. AGBANGLA Paul",
+    created_at: "2026-02-18T14:30:00Z"
+  },
+  {
+    id: "demo-3",
+    titre: "Introduction au Développement Web Full-Stack",
+    description: "Maîtrisez les bases du développement web moderne en créant une application complète avec Node.js, Express et React. Parfait pour les débutants !",
+    difficulte: "Débutant",
+    stack: ["React", "Node.js", "Express", "MongoDB", "Tailwind CSS"],
+    apis: ["REST API", "JWT Authentication", "Mongoose"],
+    etapes: [
+      "Créer un serveur backend avec Express",
+      "Concevoir une API RESTful",
+      "Construire l'interface utilisateur avec React",
+      "Connecter le frontend au backend",
+      "Implémenter l'authentification",
+      "Déployer sur Render/Vercel"
+    ],
+    liens: [
+      { label: "MDN Web Docs", url: "https://developer.mozilla.org" },
+      { label: "Express.js Guide", url: "https://expressjs.com" },
+      { label: "React Documentation", url: "https://react.dev" }
+    ],
+    fichier_zip_url: "https://cdn.example.com/cours/fullstack-pack.zip",
+    uploaded_by_name: "Ing. SANNI Aïcha",
+    created_at: "2026-02-15T09:00:00Z"
+  }
+];
 
-  // Mapping backend → frontend pour la difficulté
+// Mapping backend → frontend pour la difficulté
 const mapDifficulteFromBackend = (diff: string): string => {
   const mapping: Record<string, string> = {
     'debutant': 'Débutant',
@@ -35,29 +110,36 @@ const EFriProjects = () => {
   const { toast } = useToast();
   const [filter, setFilter] = useState("Tous");
   const [selectedProject, setSelectedProject] = useState<any>(null);
-  const [cours, setCours] = useState([]);
-  const [loading, setLoading] = useState(true);
-    // Charger les cours pratiques depuis l’API
-    useEffect(() => {
-      async function fetchCours() {
-        setLoading(true);
-        try {
-          const data = await getCoursPratiques();
-
+  const [cours, setCours] = useState(DEMO_COURS); // 🎨 Initialiser avec les données de démo
+  const [loading, setLoading] = useState(false); // Pas de loading initial
+  
+  // Charger les cours pratiques depuis l'API (en arrière-plan)
+  useEffect(() => {
+    async function fetchCours() {
+      try {
+        const data = await getCoursPratiques();
+        
+        if (data && data.length > 0) {
           const transformedData = data.map((c: any) => ({
-          ...c,
-          difficulte: mapDifficulteFromBackend(c.difficulte),
-        }));
-
-          setCours(transformedData);
-        } catch (err) {
-          toast({ title: "Erreur", description: "Impossible de charger les cours pratiques.", variant: "destructive" });
-        } finally {
-          setLoading(false);
+            ...c,
+            difficulte: mapDifficulteFromBackend(c.difficulte),
+          }));
+          
+          // Combiner les données API avec les démos (les vraies d'abord)
+          setCours([...transformedData, ...DEMO_COURS]);
         }
+      } catch (err) {
+        console.log("Utilisation des données de démonstration uniquement");
+        // En cas d'erreur, on garde juste les démos
       }
+    }
+    
+    // Charger en arrière-plan si l'utilisateur est connecté
+    if (user) {
       fetchCours();
-    }, []);
+    }
+  }, [user]);
+  
   const [isAdding, setIsAdding] = useState(false);
 
   // Form state for new course
@@ -75,7 +157,7 @@ const EFriProjects = () => {
   const isAdmin = user?.role === "admin";
   const filtered = filter === "Tous" ? cours : cours.filter(p => p.difficulte === filter);
 
-  // Defensive helpers: older/localStorage data may have `stack`, `apis`, `etapes` as strings
+  // Defensive helpers
   const asArray = (val: any) => {
     if (!val) return [];
     if (Array.isArray(val)) return val;
@@ -123,7 +205,6 @@ const EFriProjects = () => {
     localStorage.setItem(key, (count + 1).toString());
   };
 
-
   const handleAddCours = async () => {
     if (!newCours.titre || !newCours.description) {
       toast({
@@ -138,8 +219,6 @@ const EFriProjects = () => {
     formData.append("titre", newCours.titre);
     formData.append("description", newCours.description);
     
-    // CORRECTION : Mapping de la difficulté pour correspondre aux choix du modèle Django
-    // Backend attend : 'debutant', 'intermediaire', 'avance'
     const diffMap: Record<string, string> = {
       "Débutant": "debutant",
       "Intermédiaire": "intermediaire",
@@ -147,7 +226,6 @@ const EFriProjects = () => {
     };
     formData.append("difficulte", diffMap[newCours.difficulte] || "debutant");
 
-    // Send all JSON fields as stringified JSON
     formData.append("stack", JSON.stringify(asArray(newCours.stack)));
     formData.append("apis", JSON.stringify(asArray(newCours.apis)));
     formData.append("etapes", JSON.stringify(["Consulter le support de cours PDF", "Réaliser les exercices pratiques"]));
@@ -156,29 +234,40 @@ const EFriProjects = () => {
 
     try {
       const added = await uploadCoursPratique(formData);
-      setCours([added, ...cours]);
+      const transformedAdded = {
+        ...added,
+        difficulte: mapDifficulteFromBackend(added.difficulte)
+      };
+      setCours([transformedAdded, ...cours]);
       toast({ title: "Cours ajouté", description: "Le nouveau cours pratique a été publié avec succès." });
       setNewCours({ titre: "", description: "", difficulte: "Débutant", stack: "", apis: "", zipUrl: "", liens: [{ label: "", url: "" }] });
       setSelectedFile(null);
       setIsAdding(false);
     } catch (err: any) {
-      toast({ title: "Erreur", description: "Échec de l’ajout du cours pratique.", variant: "destructive" });
-      // Log backend error response for debugging
-      if (err?.response) {
-        console.error("Backend error:", err.response.data);
-        toast({ title: "Upload failed", description: `Backend error: ${JSON.stringify(err.response.data)}` });
-      } else {
-        console.error("Upload error:", err);
-        toast({ title: "Upload failed", description: "An error occurred while uploading." });
-      }
+      console.error("Upload error:", err);
+      toast({ 
+        title: "Erreur d'upload", 
+        description: err.message || "Échec de l'ajout du cours pratique.", 
+        variant: "destructive" 
+      });
     }
   };
 
   const handleDeleteCours = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
+    
+    // Ne pas supprimer les cours de démo
+    if (id.startsWith('demo-')) {
+      toast({
+        title: "Action impossible",
+        description: "Les cours de démonstration ne peuvent pas être supprimés.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     const updated = cours.filter((c: any) => c.id !== id);
     setCours(updated);
-    localStorage.setItem("unilib_cours", JSON.stringify(updated));
     toast({
       title: "Cours supprimé",
       description: "Le support de cours pratique a été retiré.",
@@ -198,6 +287,44 @@ const EFriProjects = () => {
     setSelectedFile(null);
   };
 
+  const handleDownload = (project: any) => {
+    trackDownload();
+    
+    const zipUrl = project.fichier_zip_url;
+    
+    if (zipUrl) {
+      // Si c'est une démo, simuler le téléchargement
+      if (project.id.startsWith('demo-')) {
+        toast({
+          title: "Téléchargement simulé",
+          description: "Ceci est un cours de démonstration. En production, le fichier réel serait téléchargé depuis Backblaze B2.",
+        });
+        console.log(`📥 Téléchargement simulé : ${zipUrl}`);
+      } else {
+        // Vraie URL signée de Backblaze B2
+        window.open(zipUrl, '_blank');
+        toast({
+          title: "Téléchargement démarré",
+          description: "Le fichier ZIP est en cours de téléchargement.",
+        });
+      }
+    } else {
+      toast({
+        title: "Fichier non disponible",
+        description: "Aucun pack de cours n'a été téléversé pour ce cours.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col h-[calc(100vh-8rem)] pb-20 lg:pb-0 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="flex-1 min-w-[280px]">
@@ -205,12 +332,27 @@ const EFriProjects = () => {
         <p className="font-inter text-sm text-muted-foreground mt-1">
           Approfondissez vos connaissances par des exercices et applications concrètes
         </p>
+        {cours.some(c => c.id.startsWith('demo-')) && (
+          <div className="mt-2 px-3 py-1.5 bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 rounded-lg inline-flex items-center gap-2">
+            <span className="text-xs font-medium text-amber-700 dark:text-amber-300">
+              🎨 Affichage de cours de démonstration
+            </span>
+          </div>
+        )}
       </div>
 
       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full lg:w-auto">
         <div className="flex flex-wrap gap-2 w-full sm:w-auto">
           {["Tous", "Débutant", "Intermédiaire", "Avancé"].map(d => (
-            <button key={d} onClick={() => setFilter(d)} className={`px-3 py-1.5 flex-1 sm:flex-none rounded-full font-inter text-xs font-medium transition-colors ${filter === d ? "bg-secondary text-secondary-foreground" : "bg-muted text-foreground"}`}>{d}</button>
+            <button 
+              key={d} 
+              onClick={() => setFilter(d)} 
+              className={`px-3 py-1.5 flex-1 sm:flex-none rounded-full font-inter text-xs font-medium transition-colors ${
+                filter === d ? "bg-secondary text-secondary-foreground" : "bg-muted text-foreground"
+              }`}
+            >
+              {d}
+            </button>
           ))}
         </div>
 
@@ -284,7 +426,6 @@ const EFriProjects = () => {
                   </div>
                 </div>
 
-                {/* Pack de cours upload */}
                 <div className="space-y-2 p-4 border-2 border-dashed border-border rounded-xl bg-muted/30">
                   <label className="text-sm font-semibold flex items-center gap-2">
                     <FolderArchive size={16} className="text-secondary" /> Pack du cours (.zip)
@@ -314,7 +455,6 @@ const EFriProjects = () => {
                   </label>
                 </div>
 
-                {/* Dynamic Links */}
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <label className="text-sm font-semibold flex items-center gap-2">
@@ -374,32 +514,49 @@ const EFriProjects = () => {
           <Dialog key={p.id}>
             <DialogTrigger asChild>
               <div
-                className="bg-background rounded-xl border border-border shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all overflow-hidden cursor-pointer group"
+                className="bg-background rounded-xl border border-border shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all overflow-hidden cursor-pointer group relative"
                 onClick={() => setSelectedProject(p)}
               >
-                {/* Banner */}
+                {p.id.startsWith('demo-') && (
+                  <div className="absolute top-2 right-2 z-10 px-2 py-1 bg-amber-500 text-white text-[10px] font-bold rounded-full">
+                    DÉMO
+                  </div>
+                )}
+                
                 <div className="h-40 bg-secondary/5 flex items-center justify-center transition-colors group-hover:bg-secondary/10">
                   <FolderArchive size={48} className="text-secondary/40" />
                 </div>
 
                 <div className="p-5">
                   <div className="flex items-center gap-2 mb-2">
-                    <span className={`px-2 py-0.5 rounded text-[11px] font-inter font-medium ${diffColors[p.difficulte as keyof typeof diffColors]}`}>{p.difficulte}</span>
+                    <span className={`px-2 py-0.5 rounded text-[11px] font-inter font-medium ${diffColors[p.difficulte as keyof typeof diffColors]}`}>
+                      {p.difficulte}
+                    </span>
                   </div>
-                  <h3 className="font-poppins font-semibold text-base text-foreground mb-1 group-hover:text-secondary transition-colors">{p.titre}</h3>
-                  <p className="font-inter text-xs text-muted-foreground mb-4 line-clamp-2">{p.description}</p>
+                  <h3 className="font-poppins font-semibold text-base text-foreground mb-1 group-hover:text-secondary transition-colors">
+                    {p.titre}
+                  </h3>
+                  <p className="font-inter text-xs text-muted-foreground mb-4 line-clamp-2">
+                    {p.description}
+                  </p>
 
                   <div className="flex flex-wrap gap-1.5 mb-4">
                     {asArray(p.stack).slice(0, 3).map((t: string) => (
-                      <span key={t} className="px-2 py-0.5 rounded-full bg-muted text-[10px] font-inter text-foreground">{t}</span>
+                      <span key={t} className="px-2 py-0.5 rounded-full bg-muted text-[10px] font-inter text-foreground">
+                        {t}
+                      </span>
                     ))}
-                    {asArray(p.stack).length > 3 && <span className="text-[10px] text-muted-foreground font-inter">+{asArray(p.stack).length - 3}</span>}
+                    {asArray(p.stack).length > 3 && (
+                      <span className="text-[10px] text-muted-foreground font-inter">
+                        +{asArray(p.stack).length - 3}
+                      </span>
+                    )}
                   </div>
 
                   <div className="flex items-center justify-between pt-4 border-t border-border">
                     <span className="font-inter text-[11px] text-muted-foreground">Support disponible</span>
                     <div className="flex items-center gap-2">
-                      {isAdmin && (
+                      {isAdmin && !p.id.startsWith('demo-') && (
                         <button
                           onClick={(e) => handleDeleteCours(p.id, e)}
                           className="p-1.5 text-muted-foreground hover:text-destructive transition-colors rounded hover:bg-destructive/5"
@@ -426,6 +583,11 @@ const EFriProjects = () => {
                       <span className={`px-2 py-0.5 rounded text-[10px] font-inter font-medium ${diffColors[selectedProject.difficulte as keyof typeof diffColors]}`}>
                         {selectedProject.difficulte}
                       </span>
+                      {selectedProject.id.startsWith('demo-') && (
+                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500 text-white">
+                          DÉMONSTRATION
+                        </span>
+                      )}
                     </div>
                     <DialogTitle className="font-poppins text-2xl">{selectedProject.titre}</DialogTitle>
                     <DialogDescription className="font-inter text-sm pt-2">
@@ -434,7 +596,6 @@ const EFriProjects = () => {
                   </DialogHeader>
 
                   <div className="space-y-6 py-4">
-                    {/* Stack & APIs */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div className="space-y-3">
                         <h4 className="flex items-center gap-2 font-poppins font-semibold text-sm text-foreground">
@@ -462,7 +623,6 @@ const EFriProjects = () => {
                       </div>
                     </div>
 
-                    {/* Steps */}
                     <div className="bg-muted/50 rounded-xl p-5 space-y-3">
                       <h4 className="flex items-center gap-2 font-poppins font-semibold text-sm text-foreground">
                         <Info size={16} className="text-primary" /> Guide d'apprentissage
@@ -479,16 +639,15 @@ const EFriProjects = () => {
                       </div>
                     </div>
 
-                    {/* Links */}
                     {selectedProject.liens && selectedProject.liens.length > 0 && (
                       <div className="space-y-3">
                         <h4 className="flex items-center gap-2 font-poppins font-semibold text-sm text-foreground">
                           <LinkIcon size={16} className="text-muted-foreground" /> Liens utiles
                         </h4>
                         <div className="flex flex-wrap gap-4">
-                          {selectedProject.liens.map((l: any) => (
+                          {selectedProject.liens.map((l: any, idx: number) => (
                             <a
-                              key={l.url}
+                              key={idx}
                               href={l.url}
                               target="_blank"
                               rel="noopener noreferrer"
@@ -501,39 +660,17 @@ const EFriProjects = () => {
                       </div>
                     )}
 
-                    {/* Action */}
-<div className="pt-4">
-  <button
-    onClick={() => {
-      trackDownload();
-      
-        // Utiliser fichier_zip_url du backend
-        const zipUrl = selectedProject.fichier_zip_url;
-        
-        if (zipUrl) {
-          // Ouvrir dans un nouvel onglet pour télécharger
-          window.open(zipUrl, '_blank');
-          
-          toast({
-            title: "Téléchargement démarré",
-            description: "Le fichier ZIP est en cours de téléchargement.",
-          });
-        } else {
-          toast({
-            title: "Fichier non disponible",
-            description: "Aucun pack de cours n'a été téléversé pour ce cours.",
-            variant: "destructive",
-          });
-        }
-      }}
-      className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-primary text-primary-foreground font-inter font-semibold shadow-lg shadow-primary/20 hover:opacity-90 transition-opacity"
-    >
-      <Download size={18} /> Télécharger les ressources (.zip)
-    </button>
-    <p className="font-inter text-[10px] text-muted-foreground text-center mt-3">
-      Contient les slides, les énoncés de TP et les corrigés de référence.
-    </p>
-  </div>
+                    <div className="pt-4">
+                      <button
+                        onClick={() => handleDownload(selectedProject)}
+                        className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-primary text-primary-foreground font-inter font-semibold shadow-lg shadow-primary/20 hover:opacity-90 transition-opacity"
+                      >
+                        <Download size={18} /> Télécharger les ressources (.zip)
+                      </button>
+                      <p className="font-inter text-[10px] text-muted-foreground text-center mt-3">
+                        Contient les slides, les énoncés de TP et les corrigés de référence.
+                      </p>
+                    </div>
                   </div>
                 </>
               )}
@@ -541,7 +678,7 @@ const EFriProjects = () => {
           </Dialog>
         ))}
       </div>
-    </div >
+    </div>
   );
 };
 
