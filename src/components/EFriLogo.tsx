@@ -11,9 +11,9 @@ const EFriLogo = ({ size = "md", white = false }: { size?: "sm" | "md" | "lg"; w
   return (
     <Link to="/e-fri" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
       <img src={logoifri} alt="Logo IFRI" className={`${s.img} object-contain`} />
-      <span className={`font-poppins ${s.text}`}>
+      <span className={`${s.text}`}>
         <span className={`font-medium ${white ? "text-white/80" : "text-muted-foreground"}`}>e-</span>
-        <span className={`font-bold ${white ? "text-white" : "text-foreground"}`}>FRI</span>
+        <span className={`font-semibold ${white ? "text-white" : "text-foreground"}`}>FRI</span>
       </span>
     </Link>
   );

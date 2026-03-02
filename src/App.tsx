@@ -20,6 +20,8 @@ import EFriProfile from "./pages/EFriProfile";
 import EFriAdmin from "./pages/EFriAdmin";
 import EFriForgotPassword from "./pages/EFriForgotPassword";
 import NotFound from "./pages/NotFound";
+import EntityChoices from "./pages/entityChoices";
+import ComingSoon from "./pages/comingSoon";
 
 const queryClient = new QueryClient();
 
@@ -45,6 +47,8 @@ const App = () => {
             <Route path="/e-fri/connexion" element={<EFriLogin />} />
             <Route path="/e-fri/inscription" element={<EFriSignup />} />
             <Route path="/e-fri/mot-de-passe-oublie" element={<EFriForgotPassword />} />
+            <Route path="/choix-entite" element={<EntityChoices />} />
+            <Route path="/coming-soon" element={<ComingSoon />} />
             <Route element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
               <Route path="/e-fri/dashboard" element={<EFriDashboard />} />
               <Route path="/e-fri/ressources" element={<EFriResources />} />

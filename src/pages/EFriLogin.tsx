@@ -4,6 +4,7 @@ import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { registeredUsers } from "@/data/mockData";
 import UniLibLogo from "@/components/UniLibLogo";
+import EFriLogo from "@/components/EFriLogo";
 
 const EFriLogin = () => {
   const [email, setEmail] = useState("");
@@ -83,11 +84,14 @@ const EFriLogin = () => {
   };
 
   return (
-    <div className="min-h-screen flex">
-      <div className="hidden lg:flex lg:w-[40%] bg-secondary items-center justify-center p-12">
+    <div className="min-h-screen flex bg-neutral-50">
+      <div className="hidden lg:flex lg:w-[45%] items-center justify-center p-12">
         <div className="text-center">
-          <div className="absolute top-4 left-4">
+          <div className="absolute top-4 left-4 p-8 flex flex-row items-center justify-center gap-6">
             <UniLibLogo size="small" />
+            <Link to="/e-fri">
+              <EFriLogo size="lg"/>
+            </Link>
           </div>
           <div className="flex items-center justify-center gap-2 mb-6">
             <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
@@ -95,7 +99,7 @@ const EFriLogin = () => {
               <circle cx="24" cy="24" r="12" fill="white" opacity="0.25" />
               <circle cx="20" cy="14" r="12" fill="white" opacity="0.35" />
             </svg>
-            <span className="font-poppins text-2xl text-secondary-foreground">
+            <span className="font-poppins text-2xl text-neutral-500">
               <span className="font-medium opacity-80">e-</span>
               <span className="font-bold">FRI</span>
             </span>
@@ -106,7 +110,7 @@ const EFriLogin = () => {
         </div>
       </div>
 
-      <div className="flex-1 flex items-center justify-center p-6 lg:p-12 bg-background">
+      <div className="flex-1 flex items-center justify-center p-6 lg:m-8 rounded-2xl shadow-md lg:p-12 bg-white">
         <div className="w-full max-w-md">
           <div className="flex items-center justify-between mb-4 lg:hidden">
             <UniLibLogo size="small" />
@@ -123,7 +127,7 @@ const EFriLogin = () => {
             </span>
           </Link>
 
-          <h2 className="font-poppins font-bold text-2xl text-foreground mb-1">Bienvenue sur e-FRI</h2>
+          <h2 className="font-poppins font-bold text-2xl text- mb-1">Bienvenue sur e-FRI</h2>
           <p className="font-inter text-sm text-muted-foreground mb-8">Connectez-vous pour accéder à vos ressources</p>
 
           <form onSubmit={handleSubmit} className="space-y-5">
