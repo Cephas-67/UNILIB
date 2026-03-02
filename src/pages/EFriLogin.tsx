@@ -98,9 +98,9 @@ const EFriLogin = () => {
             </Link>
           </div>
           <div className={`absolute w-[80%] min-w-[700px] aspect-square flex flex-col items-center justify-center left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2`}>
-            <img src="/public/star.svg" alt="star" className="w-40 absolute top-[2em] left-[3em]"/>
-            <img src="/public/star1.svg" alt="star" className="w-20 absolute top-[3em] right-[2em]"/>
-            <img src="/public/star2.svg" alt="star" className="w-50 absolute bottom-[-5em] right-[-2em] animate-spin duration-1000"/>
+            <img src="/public/star.svg" alt="star" className="w-40 absolute top-[14em] left-[1em]"/>
+            <img src="/public/star1.svg" alt="star" className="w-20 absolute top-[3em] right-[4em]"/>
+            <img src="/public/star2.svg" alt="star" className="w-20 absolute bottom-[-3em] right-[10em] animate-"/>
             <div className="flex flex-col items-center justify-center gap-3">
               <img src="/public/access-account.svg" alt="nigga-account" className="w-[30vw] max-w-[500px]" />
             </div>

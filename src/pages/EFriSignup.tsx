@@ -3,6 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import UniLibLogo from "@/components/UniLibLogo";
 import { Mail, Lock, Eye, EyeOff, User } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import EFriLogo from "@/components/EFriLogo";
+import { Input } from "@/components/ui/input";
 
 const filieres = ["Genie Logiciel", "Intelligence Artificielle", "Securite Informatique", "SEiot", "Internet Multimedia"];
 
@@ -44,7 +46,7 @@ const EFriSignup = () => {
         errs.verificationCode = "Un code de vérification est requis";
       } else {
         const storedCodes = JSON.parse(localStorage.getItem("unilib_resp_codes") || "[]");
-        const validCode = storedCodes.find((c: any) => c.code === form.verificationCode.toUpperCase() && !c.used);
+        const validCode = storedCodes.find((c) => c.code === form.verificationCode.toUpperCase() && !c.used);
         if (!validCode) errs.verificationCode = "Code invalide ou déjà utilisé";
       }
     }
@@ -76,7 +78,7 @@ const EFriSignup = () => {
     // Consume the code if it's a responsable
     if (form.role === "responsable") {
       const storedCodes = JSON.parse(localStorage.getItem("unilib_resp_codes") || "[]");
-      const updatedCodes = storedCodes.map((c: any) =>
+      const updatedCodes = storedCodes.map((c) =>
         c.code === form.verificationCode.toUpperCase() ? { ...c, used: true } : c
       );
       localStorage.setItem("unilib_resp_codes", JSON.stringify(updatedCodes));
@@ -102,33 +104,30 @@ const EFriSignup = () => {
     }`;
 
   return (
-    <div className="min-h-screen flex">
-      {/* Left panel */}
-      <div className="hidden lg:flex lg:w-[40%] bg-primary items-center justify-center p-12 relative">
-        <div className="absolute top-4 left-4">
-          <UniLibLogo size="small" />
-        </div>
+    <div className="min-h-screen flex bg-neutral-50">
+      <div className="hidden relative lg:flex lg:w-[45%] items-center justify-center p-12">
         <div className="text-center">
-          <div className="flex items-center justify-center gap-2 mb-6">
-            <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
-              <circle cx="16" cy="24" r="12" fill="white" opacity="0.3" />
-              <circle cx="24" cy="24" r="12" fill="white" opacity="0.25" />
-              <circle cx="20" cy="14" r="12" fill="white" opacity="0.35" />
-            </svg>
-            <span className="font-poppins text-2xl text-primary-foreground">
-              <span className="font-medium opacity-80">e-</span>
-              <span className="font-bold">FRI</span>
-            </span>
+          <div className="absolute top-4 left-4 p-8 flex flex-row items-center justify-center gap-6">
+            <UniLibLogo size="small" />
+            <div className="w-px bg-slate-300 h-10"></div>
+            <Link to="/e-fri">
+              <EFriLogo size="lg" />
+            </Link>
           </div>
-          <p className="font-inter text-sm text-primary-foreground opacity-80 max-w-xs">
-            "Rejoignez la communauté e-FRI et accédez à des milliers de ressources académiques."
-          </p>
+          <div className={`absolute w-[80%] min-w-[700px] aspect-square flex flex-col items-center justify-center left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2`}>
+            <img src="/star.svg" alt="star" className="w-40 absolute top-[14em] left-[1em]" />
+            <img src="/star1.svg" alt="star" className="w-20 absolute top-[3em] right-[4em]" />
+            <img src="/star2.svg" alt="star" className="w-20 absolute bottom-[-3em] right-[10em] animate-" />
+            <div className="flex flex-col items-center justify-center gap-3">
+              <img src="/enter-password.svg" alt="nigga-account" className="w-[30vw] max-w-[500px]" />
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Right panel */}
-      <div className="flex-1 flex items-center justify-center p-6 lg:p-12 bg-background overflow-y-auto">
-        <div className="w-full max-w-lg">
+      <div className="flex-1 flex items-center justify-center p-6 lg:m-8 rounded-2xl shadow-md lg:p-12 bg-white">
+        <div className="w-full max-w-md">
           <div className="flex items-center justify-between mb-4 lg:hidden">
             <UniLibLogo size="small" />
           </div>
@@ -153,13 +152,13 @@ const EFriSignup = () => {
                 <label className="font-inter text-sm text-foreground mb-1.5 block">Nom</label>
                 <div className="relative">
                   <User size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                  <input value={form.nom} onChange={(e) => update("nom", e.target.value)} placeholder="Votre nom" className={`${inputClass("nom")} pl-10`} />
+                  <Input value={form.nom} onChange={(e) => update("nom", e.target.value)} placeholder="Votre nom" className={`pl-10`} />
                 </div>
                 {errors.nom && <p className="font-inter text-xs text-destructive mt-1">{errors.nom}</p>}
               </div>
               <div>
                 <label className="font-inter text-sm text-foreground mb-1.5 block">Prénom</label>
-                <input value={form.prenom} onChange={(e) => update("prenom", e.target.value)} placeholder="Votre prénom" className={inputClass("prenom")} />
+                <Input value={form.prenom} onChange={(e) => update("prenom", e.target.value)} placeholder="Votre prénom"  />
                 {errors.prenom && <p className="font-inter text-xs text-destructive mt-1">{errors.prenom}</p>}
               </div>
             </div>
@@ -168,7 +167,7 @@ const EFriSignup = () => {
               <label className="font-inter text-sm text-foreground mb-1.5 block">Email</label>
               <div className="relative">
                 <Mail size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                <input type="email" value={form.email} onChange={(e) => update("email", e.target.value)} placeholder="votre@email.com" className={`${inputClass("email")} pl-10`} />
+                <Input type="email" value={form.email} onChange={(e) => update("email", e.target.value)} placeholder="votre@email.com" className={`pl-10`} />
               </div>
               {errors.email && <p className="font-inter text-xs text-destructive mt-1">{errors.email}</p>}
             </div>
@@ -196,11 +195,10 @@ const EFriSignup = () => {
             {form.role === "responsable" && (
               <div className="animate-in slide-in-from-top-2 duration-300">
                 <label className="font-inter text-sm text-foreground mb-1.5 block">Code de vérification responsable</label>
-                <input
+                <Input
                   value={form.verificationCode}
                   onChange={(e) => update("verificationCode", e.target.value)}
                   placeholder="Ex: RESP2026"
-                  className={inputClass("verificationCode")}
                 />
                 <p className="font-inter text-[10px] text-muted-foreground mt-1">Contactez l'administration pour obtenir votre code.</p>
                 {errors.verificationCode && <p className="font-inter text-xs text-destructive mt-1">{errors.verificationCode}</p>}
@@ -222,12 +220,12 @@ const EFriSignup = () => {
               <label className="font-inter text-sm text-foreground mb-1.5 block">Mot de passe</label>
               <div className="relative">
                 <Lock size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                <input
+                <Input
                   type={showPassword ? "text" : "password"}
                   value={form.password}
                   onChange={(e) => update("password", e.target.value)}
                   placeholder="Minimum 8 caractères"
-                  className={`${inputClass("password")} pl-10 pr-12`}
+                  className={` pl-10 pr-12`}
                 />
                 <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -248,19 +246,19 @@ const EFriSignup = () => {
               <label className="font-inter text-sm text-foreground mb-1.5 block">Confirmer le mot de passe</label>
               <div className="relative">
                 <Lock size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                <input
+                <Input
                   type="password"
                   value={form.confirmPassword}
                   onChange={(e) => update("confirmPassword", e.target.value)}
                   placeholder="Retapez votre mot de passe"
-                  className={`${inputClass("confirmPassword")} pl-10`}
+                  className={`pl-10`}
                 />
               </div>
               {errors.confirmPassword && <p className="font-inter text-xs text-destructive mt-1">{errors.confirmPassword}</p>}
             </div>
 
             <label className="flex items-start gap-2 cursor-pointer">
-              <input type="checkbox" checked={form.cgu} onChange={(e) => update("cgu", e.target.checked)} className="w-4 h-4 mt-0.5 rounded border-input accent-primary" />
+              <input type="checkbox" checked={form.cgu} onChange={(e) => update("cgu", e.target.checked)}  />
               <span className="font-inter text-sm text-foreground">
                 J'accepte les <a href="#" className="text-secondary hover:underline">conditions générales d'utilisation</a>
               </span>
