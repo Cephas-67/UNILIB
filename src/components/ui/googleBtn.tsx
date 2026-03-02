@@ -3,7 +3,7 @@ import React from 'react'
 function GoogleBtn({ onClick }) {
     return (
         <button
-            onClick={()=>onclick}
+            onClick={()=>onClick()}
             type="button"
             className="bg-white rounded-md shadow-lg hover:shadow-xl hover:shadow-neutral-200/40 shadow-neutral-200/40 border border-neutral-300/40 font-semibold text-neutral-700 transition-all duration-300 ease-in-out w-full h-10 px-6 py-7 flex items-center justify-center gap-2">
             <svg width="18" height="18" viewBox="0 0 24 24">
