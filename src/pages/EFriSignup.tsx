@@ -105,22 +105,24 @@ const EFriSignup = () => {
     }`;
 
   return (
-    
+
     <div className="min-h-screen flex bg-neutral-50">
       {/* Left panel */}
       <div className="hidden relative lg:flex lg:w-[45%] items-center justify-center p-12">
         <div className="text-center">
           <div className="absolute top-4 left-4 p-8 flex flex-row items-center justify-center gap-6">
-            <UniLibLogo size="small" />
+            <Link to="/">
+              <UniLibLogo size="small" />
+            </Link>
             <div className="w-px bg-slate-300 h-10"></div>
             <Link to="/e-fri">
               <EFriLogo size="lg" />
             </Link>
           </div>
           <div className={`absolute w-[80%] min-w-[700px] aspect-square flex flex-col items-center justify-center left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2`}>
-            <img src="/star.svg" alt="star" className="w-40 absolute top-[35%] left-[-5%]" />
-            <img src="/star1.svg" alt="star" className="w-20 absolute top-[3em] right-[4em]" />
-            <img src="/star2.svg" alt="star" className="w-20 absolute bottom-[-3em] right-[10em] animate-" />
+            <img src="/star.svg" alt="star" className="w-40 absolute top-[35%] left-[-5%] animate-rotate-bounce" />
+            <img src="/star1.svg" alt="star" className="w-20 absolute top-[3%] right-[4%] animate-spin animate-duration-[6000ms] animate-reverse" />
+            <img src="/star2.svg" alt="star" className="w-20 absolute bottom-[-3%] right-[10%] animate-spin animate-duration-[8000ms]" />
             <div className="flex flex-col items-center justify-center gap-3">
               <img src="/enter-password.svg" alt="nigga-account" className="w-[30vw] max-w-[500px]" />
             </div>
@@ -161,7 +163,7 @@ const EFriSignup = () => {
               </div>
               <div>
                 <label className="font-inter text-sm text-foreground mb-1.5 block">Prénom</label>
-                <Input value={form.prenom} onChange={(e) => update("prenom", e.target.value)} placeholder="Votre prénom"  />
+                <Input value={form.prenom} onChange={(e) => update("prenom", e.target.value)} placeholder="Votre prénom" />
                 {errors.prenom && <p className="font-inter text-xs text-destructive mt-1">{errors.prenom}</p>}
               </div>
             </div>
@@ -261,7 +263,7 @@ const EFriSignup = () => {
             </div>
 
             <label className="flex items-start gap-2 cursor-pointer">
-              <input type="checkbox" checked={form.cgu} onChange={(e) => update("cgu", e.target.checked)}  />
+              <input type="checkbox" checked={form.cgu} onChange={(e) => update("cgu", e.target.checked)} />
               <span className="font-inter text-sm text-foreground">
                 J'accepte les <a href="#" className="text-secondary hover:underline">conditions générales d'utilisation</a>
               </span>

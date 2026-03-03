@@ -4,7 +4,7 @@
     "entityName": "ifri",
     "logo": "/src/assets/logoifri.png",
     "slogan": "Nous batissons l'excellence",
-    "image": "",
+    "image": "/src/assets/IfriBuilding.jpeg",
     "appName": "e-Fri",
     "bgColor": "",
     "disabled": false

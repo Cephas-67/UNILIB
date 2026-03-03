@@ -33,7 +33,11 @@ function EntityCard({ entityId = null, image = "/src/assets/image_placeholder.pn
       <div className={`group w-full h-full rounded-3xl items-center justify-center flex bg-neutral-600/20 ${disabled ? "block" : "hidden"} absolute top-0 left-0`}>
         <span className='px-4 py-2 text-white/0 bg-black/0 rounded-md group-hover:bg-black/70 group-hover:text-white/90 transition-color duration-500 ease-out select-none'>Bientot disponible</span>
       </div>
-      <img className="rounded-md w-full mx-auto" src={img} alt="Logo Entité" />
+      <div
+      style={{backgroundImage:`url(${img})`}} 
+      className="rounded-md w-full aspect-[275/183] mx-auto bg-center bg-cover">
+
+      </div>
       <div className='flex flex-row items-center justify-between'>
         <div className='mt-3'>
           <p className="text-gray-900 text-xl font-semibold uppercase">{entName}</p>
@@ -41,7 +45,7 @@ function EntityCard({ entityId = null, image = "/src/assets/image_placeholder.pn
           <p className="text-gray-900 font-semibold text-sm ">UAC</p>
         </div>
         <div className='min-w-[24px] max-w-[64px] aspect-square items-center justify-center w-1/3 rounded-full overflow-hidden'>
-          <img style={{ filter: `${disabled == true ? "grayscale(100%)" : "grayscale(0%)"}` }} src={lg} alt="" />
+          <img style={{ filter: `${disabled == true ? "grayscale(100%)" : "grayscale(0%)"}` }} src={lg} alt="Logo entite" />
         </div>
       </div>
     </div>
