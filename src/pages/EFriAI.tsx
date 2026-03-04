@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect } from "react";
-import { Send, Bot, User, Loader2, Paperclip, X, FileText, Image as ImageIcon, Trash2 } from "lucide-react";
+import { Send, Bot, User, Loader2, Paperclip, X, FileText, Image as ImageIcon, Trash2, ArrowUp } from "lucide-react";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { useToast } from "@/hooks/use-toast";
 import { useSession } from "@/hooks/use-session";
+import SpinningBlobs from "@/components/ui/spinningBlobs";
 
 const suggestions = [
   "Explique-moi les algorithmes de tri",
@@ -11,8 +12,8 @@ const suggestions = [
   "Quelles sont les étapes d'un projet UML ?",
 ];
 
-type Message = { 
-  role: "user" | "ai"; 
+type Message = {
+  role: "user" | "ai";
   content: string;
   file?: { name: string; type: string; preview?: string };
 };
@@ -56,11 +57,15 @@ const EFriAI = () => {
   useEffect(() => {
     const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
 
-    const listModels = async () => { try { const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`); 
-    const data = await response.json(); console.log("Modèles disponibles pour votre clé :", data.models); } 
-    catch (e) { console.error("Impossible de lister les modèles", e); } }; 
+    const listModels = async () => {
+      try {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
+        const data = await response.json(); console.log("Modèles disponibles pour votre clé :", data.models);
+      }
+      catch (e) { console.error("Impossible de lister les modèles", e); }
+    };
     listModels();
-    
+
     if (!apiKey) {
       console.error('Clé API Gemini manquante');
       toast({
@@ -91,7 +96,7 @@ const EFriAI = () => {
     if (!genAI) return;
 
     const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-    
+
     // Convertir l'historique en format Gemini
     const history = messages
       .filter(m => !m.file) // Exclure messages avec fichiers (pas supportés dans l'historique)
@@ -192,8 +197,8 @@ const EFriAI = () => {
       return;
     }
 
-    const userMsg: Message = { 
-      role: "user", 
+    const userMsg: Message = {
+      role: "user",
       content: text || "(Fichier joint)",
       file: selectedFile ? {
         name: selectedFile.name,
@@ -201,7 +206,7 @@ const EFriAI = () => {
         preview: filePreview || undefined,
       } : undefined,
     };
-    
+
     setMessages(prev => [...prev, userMsg]);
     setInput("");
     setLoading(true);
@@ -216,7 +221,7 @@ const EFriAI = () => {
         // ✅ AVEC FICHIER
         const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
         const filePart = await fileToGenerativePart(currentFile);
-        
+
         const prompt = `Tu es un assistant pédagogique pour l'IFRI (Institut de Formation et de Recherche en Informatique) au Bénin.
 Analyse ce fichier et réponds à la question de l'étudiant en français ou en anglais selon la langue utilisée par l'étudiant.
 
@@ -250,7 +255,7 @@ Question: ${text || "Analyse ce fichier et explique son contenu"}`;
 
     } catch (error: any) {
       console.error('Erreur Gemini:', error);
-      
+
       const errorMsg: Message = {
         role: "ai",
         content: "Désolé, je rencontre un problème technique. Veuillez réessayer. 🔧"
@@ -275,12 +280,12 @@ Question: ${text || "Analyse ce fichier et explique son contenu"}`;
   // ✅ EFFACER L'HISTORIQUE
   const clearHistory = () => {
     if (!confirm("Voulez-vous vraiment effacer tout l'historique ?")) return;
-    
+
     setMessages([]);
     if (user?.email) {
       localStorage.removeItem(`gemini_chat_${user.email}`);
     }
-    
+
     toast({
       title: "Historique effacé",
       description: "La conversation a été réinitialisée",
@@ -288,7 +293,7 @@ Question: ${text || "Analyse ce fichier et explique son contenu"}`;
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-8rem)] pb-20 lg:pb-0">
+    <div className="flex flex-col h-[calc(100vh-2rem)] pb-20 lg:pb-0">
       {/* Header avec bouton clear */}
       {messages.length > 0 && (
         <div className="p-3 border-b border-border bg-background flex items-center justify-between">
@@ -312,16 +317,14 @@ Question: ${text || "Analyse ce fichier et explique son contenu"}`;
       <div className="flex-1 overflow-y-auto space-y-4 p-4">
         {messages.length === 0 && (
           <div className="flex flex-col items-center justify-center h-full text-center">
-            <div className="w-16 h-16 rounded-2xl bg-secondary/10 flex items-center justify-center mb-4">
-              <Bot size={32} className="text-secondary" />
-            </div>
+            <SpinningBlobs disabled={false} />
             <h2 className="font-poppins font-semibold text-xl text-foreground mb-2">
               Assistant IA e-FRI
             </h2>
             <p className="font-inter text-sm text-muted-foreground mb-2 max-w-md">
               Posez une question, uploadez un document ou une image pour obtenir de l'aide.
             </p>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-w-lg w-full">
               {suggestions.map((s, i) => (
                 <button
@@ -343,11 +346,10 @@ Question: ${text || "Analyse ce fichier et explique son contenu"}`;
                 <Bot size={16} className="text-white" />
               </div>
             )}
-            <div className={`max-w-[80%] p-4 rounded-xl font-inter text-sm ${
-              msg.role === "user" 
-                ? "bg-secondary text-secondary-foreground rounded-tr-none" 
-                : "bg-muted text-foreground rounded-tl-none"
-            }`}>
+            <div className={`max-w-[80%] p-4 rounded-xl font-inter text-sm ${msg.role === "user"
+              ? "bg-secondary text-secondary-foreground rounded-tr-none"
+              : "bg-muted text-foreground rounded-tl-none"
+              }`}>
               {/* Fichier attaché */}
               {msg.file && (
                 <div className="mb-3 p-2 bg-background/50 rounded-lg border border-border/50">
@@ -361,7 +363,7 @@ Question: ${text || "Analyse ce fichier et explique son contenu"}`;
                   )}
                 </div>
               )}
-              
+
               <div className="prose prose-sm max-w-none">
                 {msg.content.split('\n').map((line, idx) => (
                   <p key={idx} className="mb-2 last:mb-0 whitespace-pre-wrap">
@@ -425,40 +427,43 @@ Question: ${text || "Analyse ce fichier et explique son contenu"}`;
 
       {/* Input */}
       <form onSubmit={handleSubmit} className="flex items-center gap-2 p-3 border-t border-border bg-background">
-        <input
-          type="file"
-          ref={fileInputRef}
-          onChange={handleFileSelect}
-          accept="image/*,application/pdf"
-          className="hidden"
-        />
-        <button
-          type="button"
-          onClick={() => fileInputRef.current?.click()}
-          className="p-2.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
-          title="Joindre un fichier"
-        >
-          <Paperclip size={18} />
-        </button>
-        <input
-          ref={inputRef}
-          value={input}
-          onChange={e => setInput(e.target.value)}
-          placeholder="Posez votre question..."
-          disabled={loading || !genAI}
-          className="flex-1 py-2.5 px-4 rounded-xl border border-border bg-background font-inter text-sm outline-none focus:border-secondary disabled:opacity-50"
-        />
-        <button
-          type="submit"
-          disabled={(!input.trim() && !selectedFile) || loading || !genAI}
-          className="p-3 rounded-xl bg-secondary text-secondary-foreground disabled:opacity-40 hover:opacity-90 transition-opacity flex items-center gap-2"
-        >
-          {loading ? (
-            <Loader2 size={18} className="animate-spin" />
-          ) : (
-            <Send size={18} />
-          )}
-        </button>
+        <div className=" w-[70%] max-w-[800px] h-16 bg-background mx-auto flex items-center border-2 border-border rounded-full shadow-md shadow-neutral-100 p-3">
+
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileSelect}
+            accept="image/*,application/pdf"
+            className="hidden"
+          />
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className="p-2.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
+            title="Joindre un fichier"
+          >
+            <Paperclip size={18} />
+          </button>
+          <input
+            ref={inputRef}
+            value={input}
+            onChange={e => setInput(e.target.value)}
+            placeholder="Posez votre question..."
+            // disabled={loading || !genAI}
+            className="flex-1 py-2.5 px-4 rounded-xl bg-background font-inter text-sm outline-none focus:border-secondary disabled:opacity-50"
+          />
+          <button
+            type="submit"
+            disabled={(!input.trim() && !selectedFile) || loading || !genAI}
+            className="p-3 rounded-full bg-blue-500 disabled:bg-neutral-400 text-white hover:opacity-90 transition-opacity flex items-center gap-2"
+          >
+            {loading ? (
+              <Loader2 size={18} className="animate-spin" />
+            ) : (
+              <ArrowUp size={20} />
+            )}
+          </button>
+        </div>
       </form>
     </div>
   );
