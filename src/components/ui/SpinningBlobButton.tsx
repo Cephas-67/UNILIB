@@ -1,6 +1,7 @@
 import React from 'react'
+import { ArrowUp, Loader2 } from "lucide-react";
 
-function SpinningBlobs({ disabled = false }) {
+function SpinningBlobButton({ loading = false, disabled = false, onClick }) {
     return (
         <div
             className="relative flex items-center justify-center w-20 aspect-square"
@@ -77,12 +78,27 @@ function SpinningBlobs({ disabled = false }) {
                     fill="#38bdf8"
                 />
             </svg>
-            <div className="absolute bg-white  z-10 w-12 h-12 blur-sm rounded-full flex items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95"></div>
-            <div className="relative bg-white p-2 z-20 w-10 h-10 rounded-full flex flex-row items-center justify-center gap-2 transition-all duration-200 hover:scale-110 active:scale-95">
-                <div className='w-2 aspect-[1/2] rounded-[100%] bg-black'></div>
-                <div className='w-2 aspect-[1/2] rounded-[100%] bg-black'></div>
-            </div>
-            
+
+            {/* Button */}
+            <button
+                type="submit"
+                disabled={disabled || loading}
+                onClick={onClick}
+                className="relative z-10 w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95"
+                style={{
+                    background: "rgba(15,15,20,0.95)",
+                    boxShadow: disabled
+                        ? "0 0 0 1px #e5e7eb"
+                        : "0 0 0 1.5px rgba(37,99,235,0.25), 0 1px 8px rgba(0,0,0,0.08)",
+                }}
+            >
+                {loading ? (
+                    <Loader2 size={16} className="animate-spin text-blue-300" />
+                ) : (
+                    <ArrowUp size={18} className={disabled ? "text-neutral-300" : "text-blue-300"} />
+                )}
+            </button>
+
             <style>{`
         @keyframes spin {
           from { transform: rotate(0deg); }
@@ -97,4 +113,4 @@ function SpinningBlobs({ disabled = false }) {
     )
 }
 
-export default SpinningBlobs
+export default SpinningBlobButton

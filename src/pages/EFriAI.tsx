@@ -426,8 +426,8 @@ Question: ${text || "Analyse ce fichier et explique son contenu"}`;
       )}
 
       {/* Input */}
-      <form onSubmit={handleSubmit} className="flex items-center gap-2 p-3 border-t border-border bg-background">
-        <div className=" w-[70%] max-w-[800px] h-16 bg-background mx-auto flex items-center border-2 border-border rounded-full shadow-md shadow-neutral-100 p-3">
+      <form onSubmit={handleSubmit} className="flex items-center gap-2 p-3">
+        <div className="w-[90%] md:w-[70%] max-w-[800px] h-16 bg-background mx-auto flex items-center border-2 border-border rounded-full shadow-md shadow-neutral-100 p-3">
 
           <input
             type="file"
@@ -450,7 +450,7 @@ Question: ${text || "Analyse ce fichier et explique son contenu"}`;
             onChange={e => setInput(e.target.value)}
             placeholder="Posez votre question..."
             // disabled={loading || !genAI}
-            className="flex-1 py-2.5 px-4 rounded-xl bg-background font-inter text-sm outline-none focus:border-secondary disabled:opacity-50"
+            className="w-full py-2.5 px-4 rounded-xl bg-background font-inter text-sm outline-none focus:border-secondary disabled:opacity-50"
           />
           <button
             type="submit"
